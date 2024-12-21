@@ -7,16 +7,21 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
-public class Game extends JFrame{
+public class Game extends JFrame implements Runnable{
 
     private GameScreen gameScreen;
     private BufferedImage img;
-    private double timePerFrame;
-    private long lastFrame;
+    private double timePerUpdate;
+    private long lastUpdate;
+    private int updates;
+    private long lastTimeUPS;
+
+    private Thread gameThread;
+
 
     public Game(){
     
-        timePerFrame = 1000000000.0 / 60.0;
+        timePerUpdate = 1000000000.0 / 30.0;
 
         importImg();
 
@@ -32,13 +37,25 @@ public class Game extends JFrame{
 
     private void loopGame(){
         while(true){
-            if(System.nanoTime() - lastFrame >= timePerFrame){
-                lastFrame = System.nanoTime();
-                repaint();
-            }else{
-    
-            }
+
+            
         }
+    }
+
+    public void callUPS(){
+        if(System.currentTimeMillis() - lastTimeUPS >= 1000){
+            System.out.println("UPS: " + updates);
+            updates = 0;
+            lastTimeUPS = System.currentTimeMillis();
+        }
+    }
+
+
+    private void updateGame(){
+        updates++;
+        lastUpdate = System.nanoTime();
+        //System.out.println("Game Updated!");
+
     }
 
     private void importImg(){
@@ -49,10 +66,41 @@ public class Game extends JFrame{
             e.printStackTrace();
         }
     }
+
+    private void start(){
+        gameThread = new Thread(this){};
+
+        gameThread.start();
+    }
     public static void main(String[] args) {
         Game game = new Game();
         game.loopGame();
     }
 
+    @Override
+    public void run(){
+        double timePerFrame;
+        long lastFrame = System.nanoTime();
+
+        timePerFrame = 1000000000.0 / 30.0;
+
+        while(true){
+
+            //Render
+            if(System.nanoTime() - lastFrame >= timePerFrame){
+                lastFrame = System.nanoTime();
+                repaint();
+            }
+
+            if(System.nanoTime() - lastUpdate >= timePerUpdate){
+                updateGame();
+            }
+
+
+        }
+        //Update
+
+        //checking FPS and UPS
+    }
 }
 

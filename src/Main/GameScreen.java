@@ -17,7 +17,6 @@ public class GameScreen extends JPanel{
         this.img = img;
         LoadSprites();
         random = new Random();
-
     }
 
     private void LoadSprites(){
@@ -36,7 +35,7 @@ public class GameScreen extends JPanel{
                 g.drawImage(img.getSubimage(19*64, 6*64, 64, 64), x*64, y*64, null);
             }
         }
-
+        
         callFPS();
     }
 
