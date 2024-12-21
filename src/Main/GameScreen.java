@@ -9,27 +9,43 @@ import java.util.Random;
 public class GameScreen extends JPanel{ 
     private Random random;
     private BufferedImage img;
-    private ArrayList <BufferedImage> sprites = new ArrayList<>()
+    private ArrayList <BufferedImage> sprites = new ArrayList<>();
+    private long lastTime = System.currentTimeMillis();
+    private int frames;
 
     public GameScreen(BufferedImage img){
         this.img = img;
+        LoadSprites();
         random = new Random();
+
     }
 
     private void LoadSprites(){
-
+        for(int y = 0; y < 10; y++){
+            for(int x = 0; x < 10; x++){
+                sprites.add(img.getSubimage(20*64, 10*64, 64, 64));
+            }
+        }
     }
 
     public void paintComponent(Graphics g){
         super.paintComponent(g);
 
-        g.drawImage(img.getSubimage(0, 32, 32, 32), 0, 0, null);
-    }
-    public Color randColor(){
-        int r = random.nextInt(256);
-        int g = random.nextInt(256);
-        int b = random.nextInt(256);
+        for(int y = 0; y < 10; y++){
+            for(int x = 0; x < 10; x++){
+                g.drawImage(img.getSubimage(19*64, 6*64, 64, 64), x*64, y*64, null);
+            }
+        }
 
-        return new Color(r,g,b);
+        callFPS();
+    }
+
+    private void callFPS(){
+        frames++;
+        if(System.currentTimeMillis() - lastTime >= 1000){
+            System.out.println("FPS: " + frames);
+            frames = 0;
+            lastTime = System.currentTimeMillis();
+        }
     }
 }

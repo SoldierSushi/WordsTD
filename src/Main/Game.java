@@ -11,9 +11,13 @@ public class Game extends JFrame{
 
     private GameScreen gameScreen;
     private BufferedImage img;
+    private double timePerFrame;
+    private long lastFrame;
 
     public Game(){
     
+        timePerFrame = 1000000000.0 / 60.0;
+
         importImg();
 
         setSize(640,640);
@@ -26,8 +30,19 @@ public class Game extends JFrame{
 
     }
 
-    public void importImg(){
-        InputStream is = getClass().getResourceAsStream("/Main/spriteatlas.png");
+    private void loopGame(){
+        while(true){
+            if(System.nanoTime() - lastFrame >= timePerFrame){
+                lastFrame = System.nanoTime();
+                repaint();
+            }else{
+    
+            }
+        }
+    }
+
+    private void importImg(){
+        InputStream is = getClass().getResourceAsStream("/Main/towerDefense_tilesheet.png");
         try {
             img = ImageIO.read(is);
         } catch (IOException e) {
@@ -35,7 +50,8 @@ public class Game extends JFrame{
         }
     }
     public static void main(String[] args) {
-        new Game();
+        Game game = new Game();
+        game.loopGame();
     }
 
 }
