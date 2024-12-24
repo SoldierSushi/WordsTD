@@ -5,13 +5,13 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
 public class GameScreen extends JPanel implements Runnable{ 
     private BufferedImage img;
     private long fps = 0;
     private long lastTime;
     private long lastFrameTime;
-    Thread fpsThread;
     private double timePerFrame = 1000000000.0 / 30.0;
     private Image[][] backGroundImages;
     private int size = 13;
@@ -38,17 +38,29 @@ public class GameScreen extends JPanel implements Runnable{
         lastFrameTime = System.nanoTime();
         this.img = img;
         preloadBackground();
-        fpsThreadStart();
-
-        // Initialize enemies
-        enemies = new ArrayList<>();
-        enemies.add(new Enemy(0, 64, img.getSubimage(20 * 64, 6 * 64, 64, 64)));
+        Thread fpsThread = new Thread(this);
+        fpsThread.start();
     }
 
     @Override
     public void run() {
+        // Initialize enemies
+        enemies = new ArrayList<>();
+        long spawnInterval = 1000000000; // 1 second in nanoseconds
+        long lastSpawnTime = System.nanoTime();
+        int enemyCounter = 0;
+
         while (true) {
             long currentTime = System.nanoTime(); //finds the last time the frame needs to be changed
+
+            if (currentTime - lastSpawnTime >= spawnInterval) {
+                if(enemyCounter < 4){
+                    enemies.add(new Enemy(0, 64, img.getSubimage(20 * 64, 6 * 64, 64, 64)));
+                    lastSpawnTime = currentTime; // Reset spawn timer
+                    enemyCounter++;
+                }
+            }
+
             if (System.nanoTime() - lastTime >= timePerFrame) {
                 updateEnemies(); // Update logic
                 repaint(); // Request a repaint
@@ -89,12 +101,6 @@ public class GameScreen extends JPanel implements Runnable{
             }
         }
 
-    }
-
-    public void fpsThreadStart(){
-        lastTime = System.nanoTime();
-        fpsThread = new Thread(this);
-        fpsThread.start();
     }
 
     private void updateStuff() {
