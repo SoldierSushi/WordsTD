@@ -43,6 +43,11 @@ public class Enemy {
         if (enemyY < targetY) enemyY += 8;
         if (enemyY > targetY) enemyY -= 8;
     
+        try {
+            Thread.sleep(6); // ~16ms for 60 FPS
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         // If reached target cell, find the next cell
         if(enemyPathMap[mapY][mapX] != 62){
             if (enemyX == targetX && enemyY == targetY) {

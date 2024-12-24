@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.concurrent.TimeUnit;
 
 public class GameScreen extends JPanel implements Runnable{ 
     private BufferedImage img;
@@ -84,7 +83,7 @@ public class GameScreen extends JPanel implements Runnable{
             enemy.draw(g);
         }
 
-        updateStuff();
+        updateFPS();
     }
 
     public void preloadBackground(){
@@ -103,7 +102,7 @@ public class GameScreen extends JPanel implements Runnable{
 
     }
 
-    private void updateStuff() {
+    private void updateFPS() {
         fps++;
         long currentFrameTime = System.nanoTime();
         if (currentFrameTime - lastFrameTime >= 1000000000) { // One second has passed
