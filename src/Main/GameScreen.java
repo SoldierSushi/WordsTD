@@ -6,12 +6,10 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class GameScreen extends JPanel implements Runnable{ 
+public class GameScreen extends JPanel{ 
     private BufferedImage img;
-    private long fps = 0;
     private long lastTime;
     private long lastFrameTime;
-    private double timePerFrame = 1000000000.0 / 30.0;
     private Image[][] backGroundImages;
     private int size = 13;
     private int[][] map = {
@@ -37,37 +35,57 @@ public class GameScreen extends JPanel implements Runnable{
         lastFrameTime = System.nanoTime();
         this.img = img;
         preloadBackground();
-        Thread fpsThread = new Thread(this);
-        fpsThread.start();
+        startGameThread();
     }
 
-    @Override
-    public void run() {
-        // Initialize enemies
+    public void startGameThread(){
         enemies = new ArrayList<>();
-        long spawnInterval = 1000000000; // 1 second in nanoseconds
-        long lastSpawnTime = System.nanoTime();
-        int enemyCounter = 0;
 
-        while (true) {
-            long currentTime = System.nanoTime(); //finds the last time the frame needs to be changed
+        Thread gameThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int fps = 0;
+                long spawnInterval = 1000000000; // 1 second in nanoseconds
+                long lastSpawnTime = System.nanoTime();
+                int enemyCounter = 0;
 
-            if (currentTime - lastSpawnTime >= spawnInterval) {
-                if(enemyCounter < 4){
-                    enemies.add(new Enemy(0, 64, img.getSubimage(20 * 64, 6 * 64, 64, 64)));
-                    lastSpawnTime = currentTime; // Reset spawn timer
-                    enemyCounter++;
+                while(true){
+                    //Spawns enemies in intervals
+                    long currentTime = System.nanoTime();
+                    if (currentTime - lastSpawnTime >= spawnInterval) {
+                        if(enemyCounter < 4){
+                            enemies.add(new Enemy(0, 64, img.getSubimage(20 * 64, 6 * 64, 64, 64)));
+                            lastSpawnTime = currentTime;
+                            enemyCounter++;
+                        }
+                    }
+
+                    //displays fps in console
+                    if (fps == 30) {
+                        System.out.println("FPS: " + fps);
+                        fps = 0;
+                    } else {
+                        fps++;
+                    }
+
+                    //real stuff
+                    updateEnemies();
+                    repaint();
+
+                    //saves cpu usage
+                    long frameTime = System.nanoTime();
+                    try {
+                        long sleepTime = Math.max(0, 33 - (System.nanoTime() - frameTime) / 1_000_000);
+                        Thread.sleep(sleepTime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
-
-            if (System.nanoTime() - lastTime >= timePerFrame) {
-                updateEnemies(); // Update logic
-                repaint(); // Request a repaint
-                lastTime = currentTime; // Reset frame timer
-            }
-        }
+        }, "gameThread");
+        gameThread.start();
     }
-
+         
     @Override
     public void paintComponent(Graphics g){
         super.paintComponent(g);
@@ -78,12 +96,9 @@ public class GameScreen extends JPanel implements Runnable{
             }
         }
 
-        // Draw all enemies
         for (Enemy enemy : enemies) {
             enemy.draw(g);
         }
-
-        updateFPS();
     }
 
     public void preloadBackground(){
@@ -102,23 +117,12 @@ public class GameScreen extends JPanel implements Runnable{
 
     }
 
-    private void updateFPS() {
-        fps++;
-        long currentFrameTime = System.nanoTime();
-        if (currentFrameTime - lastFrameTime >= 1000000000) { // One second has passed
-            System.out.println("FPS: " + fps);
-            fps = 0;
-            lastFrameTime = currentFrameTime;
-        }
-    }
-
     private void updateEnemies() {
         // Use an iterator to safely remove enemies
         Iterator<Enemy> iterator = enemies.iterator();
         while (iterator.hasNext()) {
             Enemy enemy = iterator.next();
             if (enemy.update()) {
-                // Remove enemy if it reached the end goal
                 iterator.remove();
                 System.out.println("Enemy reached the end and was removed.");
             }
