@@ -1,15 +1,16 @@
 package Main;
 
 import javax.swing.JPanel;
+import java.awt.event.MouseEvent;
+
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 public class GameScreen extends JPanel{ 
     private BufferedImage img;
-    private long lastTime;
-    private long lastFrameTime;
     private Image[][] backGroundImages;
     private int size = 13;
     private int[][] map = {
@@ -28,18 +29,18 @@ public class GameScreen extends JPanel{
         {0,1,1,1,1,1,1,1,1,1,1,1,9},
     };
 
-    private ArrayList<Enemy> enemies;
+    private ArrayList<Enemy> enemies = new ArrayList<>();
+    private ArrayList<Tower> towers = new ArrayList<>();
 
     public GameScreen(BufferedImage img) {
-        lastTime = System.nanoTime();
-        lastFrameTime = System.nanoTime();
         this.img = img;
+
         preloadBackground();
         startGameThread();
+        setupMouseListener();
     }
 
     public void startGameThread(){
-        enemies = new ArrayList<>();
 
         Thread gameThread = new Thread(new Runnable() {
             @Override
@@ -85,6 +86,25 @@ public class GameScreen extends JPanel{
         }, "gameThread");
         gameThread.start();
     }
+
+    private void setupMouseListener() {
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                System.out.println("Mouse clicked.");
+                int x = e.getX() / 64;
+                int y = e.getY() / 64;
+
+                if (x >= 0 && x < size && y >= 0 && y < size) {
+                    if (map[y][x] == 0) { // Only place a tower on empty tiles
+                        map[y][x] = 2; // Mark the tile as occupied
+                        towers.add(new Tower(x, y, img.getSubimage(19 * 64, 10 * 64, 64, 64)));
+                    }
+                }
+            }
+        });
+    }
+
          
     @Override
     public void paintComponent(Graphics g){
@@ -98,6 +118,10 @@ public class GameScreen extends JPanel{
 
         for (Enemy enemy : enemies) {
             enemy.draw(g);
+        }
+
+        for(Tower tower : towers){
+            tower.draw(g);
         }
     }
 

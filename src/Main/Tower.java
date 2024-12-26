@@ -4,39 +4,32 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 public class Tower {
-
     private BufferedImage image;
-    
-    private int[][] towerPlacementMap = {
-        {0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {1,1,1,1,1,0,1,1,1,1,1,0,0},
-        {0,0,2,0,1,0,1,0,0,0,1,0,0},
-        {0,1,1,1,1,0,1,0,0,0,1,0,0},
-        {0,1,0,0,0,0,1,0,0,0,1,0,0},
-        {0,1,0,0,0,0,1,0,0,0,1,0,0},
-        {0,1,0,0,1,1,1,0,0,0,1,0,0},
-        {0,1,0,0,1,0,0,0,1,1,1,0,0},
-        {0,1,1,1,1,0,0,0,1,0,0,0,0},
-        {0,0,0,0,0,0,0,0,1,0,0,0,0},
-        {0,1,1,1,1,1,1,1,1,0,0,0,0},
-        {0,1,0,0,0,0,0,0,0,0,0,0,0},
-        {0,1,1,1,1,1,1,1,1,1,1,1,1},
+    private int towerY;
+    private int towerX;
+    private boolean[][] towerMap = {
+        {false, false, false, false, false, false, false, false, false, false, false, false, false},
+        {true, true, true, true, true, false, true, true, true, true, true, false, false},
+        {false, false, false, false, true, false, true, false, false, false, true, false, false},
+        {false, true, true, true, true, false, true, false, false, false, true, false, false},
+        {false, true, false, false, false, false, true, false, false, false, true, false, false},
+        {false, true, false, false, false, false, true, false, false, false, true, false, false},
+        {false, true, false, false, true, true, true, false, false, false, true, false, false},
+        {false, true, false, false, true, false, false, false, true, true, true, false, false},
+        {false, true, true, true, true, false, false, false, true, false, false, false, false},
+        {false, false, false, false, false, false, false, false, true, false, false, false, false},
+        {false, true, true, true, true, true, true, true, true, false, false, false, false},
+        {false, true, false, false, false, false, false, false, false, false, false, false, false},
+        {false, true, true, true, true, true, true, true, true, true, true, true, true},
     };
 
-    public Tower(BufferedImage image){
+    public Tower(int towerX, int towerY, BufferedImage image) {
+        this.towerX = towerX;
+        this.towerY = towerY;
         this.image = image;
     }
 
     public void draw(Graphics g) {
-        g.drawImage(null, 0, 0, null)
+        g.drawImage(image, towerX*64, towerY*64, null);
     }
-
-    /*
-        tower x, tower y
-        update towerPlacementMap
-        get centers of towers ( length / 2)
-
-    */
-    
-
 }
