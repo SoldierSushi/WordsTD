@@ -121,8 +121,14 @@ public class GameScreen extends JPanel{
         }
 
         for(Tower tower : towers){
-            tower.nearestEnemy(x, y, );
-            tower.draw(g);
+            Enemy nearestEnemy = tower.nearestEnemy(enemies);
+            double angleToEnemy = 0;
+            if (nearestEnemy != null) {
+                g.setColor(Color.RED);
+                g.drawLine(tower.getX() * 64 + 32, tower.getY() * 64 + 32, nearestEnemy.getX() + 32, nearestEnemy.getY() + 32);
+                angleToEnemy = tower.angleToNearestEnemy(nearestEnemy);
+            }
+            tower.draw(g, angleToEnemy);
         }
     }
 

@@ -67,6 +67,14 @@ public class Enemy {
         }
     }
 
+    public int getX() {
+        return enemyX; // Replace with the actual x-coordinate field
+    }
+    
+    public int getY() {
+        return enemyY; // Replace with the actual y-coordinate field
+    }
+
     public void draw(Graphics g) {
         g.drawImage(image, enemyX, enemyY, null);
     }
