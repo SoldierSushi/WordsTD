@@ -121,6 +121,7 @@ public class GameScreen extends JPanel{
         }
 
         for(Tower tower : towers){
+            tower.nearestEnemy(x, y, );
             tower.draw(g);
         }
     }
