@@ -31,6 +31,8 @@ public class GameScreen extends JPanel{
 
     private ArrayList<Enemy> enemies = new ArrayList<>();
     private ArrayList<Tower> towers = new ArrayList<>();
+    private int fps = 0;
+    private double angleToEnemy = 0;
 
     public GameScreen(BufferedImage img) {
         this.img = img;
@@ -45,7 +47,7 @@ public class GameScreen extends JPanel{
         Thread gameThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                int fps = 0;
+                fps = 0;
                 long spawnInterval = 1000000000; // 1 second in nanoseconds
                 long lastSpawnTime = System.nanoTime();
                 int enemyCounter = 0;
@@ -122,7 +124,7 @@ public class GameScreen extends JPanel{
 
         for(Tower tower : towers){
             Enemy nearestEnemy = tower.nearestEnemy(enemies);
-            double angleToEnemy = 0;
+            angleToEnemy = 0;
             if (nearestEnemy != null) {
                 g.setColor(Color.RED);
                 g.drawLine(tower.getX() * 64 + 32, tower.getY() * 64 + 32, nearestEnemy.getX() + 32, nearestEnemy.getY() + 32);
@@ -130,6 +132,11 @@ public class GameScreen extends JPanel{
             }
             tower.draw(g, angleToEnemy);
         }
+
+        if(fps == 30){
+            Projectile.shoot(5, angleToEnemy);
+        }
+        Projectile.draw(g);
     }
 
     public void preloadBackground(){

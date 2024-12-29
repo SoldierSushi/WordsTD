@@ -8,6 +8,7 @@ public class Enemy {
     private int enemyY = 64;
     private BufferedImage image;
     private int mapX = 0, mapY = 0;
+    private int health = 10;
     private int[][] enemyPathMap = {
         {0,0,0,0,0,0,0,0,0,0,0,0,0},
         {1,2,3,4,5,0,27,28,29,30,31,0,0},
@@ -30,6 +31,7 @@ public class Enemy {
         this.image = image;
         this.mapX = enemyX / 64;
         this.mapY = enemyY / 64;
+        this.health = health;
     }
 
     public boolean update() {

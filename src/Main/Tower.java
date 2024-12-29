@@ -53,12 +53,15 @@ public class Tower {
         return angleInDegrees;
     }
 
-    public int getX() {
-        return towerX*64;
-    }
+    public int getX() { return towerX*64; }
     
-    public int getY() {
-        return towerY*64;
+    public int getY() { return towerY*64; }
+
+    public Projectile shoot(int speed, double angle){
+        double velocityX = speed * Math.cos(angle);
+        double velocityY = speed * Math.sin(angle);
+
+        return new Projectile(towerX, towerY, velocityX, velocityY);
     }
 
     public void draw(Graphics g, double angleToEnemy) {
@@ -72,7 +75,7 @@ public class Tower {
         g2d.translate(towerScreenX + 32, towerScreenY + 32);
     
         // Adjust angle by -90 degrees if the image is initially pointing up
-        g2d.rotate(Math.toRadians(angleToEnemy - 270));
+        g2d.rotate(Math.toRadians(angleToEnemy + 90));
     
         g2d.drawImage(image, -32, -32, null);
     
