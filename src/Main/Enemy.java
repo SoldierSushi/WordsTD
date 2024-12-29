@@ -1,6 +1,7 @@
 package Main;
 
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 public class Enemy {
@@ -8,7 +9,7 @@ public class Enemy {
     private int enemyY = 64;
     private BufferedImage image;
     private int mapX = 0, mapY = 0;
-    private int health = 10;
+    private int health = 1;
     private int[][] enemyPathMap = {
         {0,0,0,0,0,0,0,0,0,0,0,0,0},
         {1,2,3,4,5,0,27,28,29,30,31,0,0},
@@ -51,8 +52,13 @@ public class Enemy {
                 findNextCell();
             }
         }else{
+            return true; 
+        }
+        
+        if(health == 0){
             return true;
         }
+
         return false;
     }
 
@@ -75,6 +81,15 @@ public class Enemy {
     
     public int getY() {
         return enemyY; // Replace with the actual y-coordinate field
+    }
+
+    public Rectangle getBounds() {
+        return new Rectangle(enemyX, enemyY, 64, 64); // Assuming enemy size is 64x64 pixels
+    }
+
+    public boolean takeDamage(int damage) {
+        health -= damage;
+        return health <= 0;
     }
 
     public void draw(Graphics g) {

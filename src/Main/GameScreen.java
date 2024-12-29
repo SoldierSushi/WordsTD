@@ -31,6 +31,7 @@ public class GameScreen extends JPanel{
 
     private ArrayList<Enemy> enemies = new ArrayList<>();
     private ArrayList<Tower> towers = new ArrayList<>();
+    private ArrayList<Projectile> projectiles = new ArrayList<>();
     private int fps = 0;
     private double angleToEnemy = 0;
 
@@ -126,17 +127,15 @@ public class GameScreen extends JPanel{
             Enemy nearestEnemy = tower.nearestEnemy(enemies);
             angleToEnemy = 0;
             if (nearestEnemy != null) {
-                g.setColor(Color.RED);
-                g.drawLine(tower.getX() * 64 + 32, tower.getY() * 64 + 32, nearestEnemy.getX() + 32, nearestEnemy.getY() + 32);
                 angleToEnemy = tower.angleToNearestEnemy(nearestEnemy);
+                if (fps == 30) {
+                    projectiles.add(tower.shoot(40, angleToEnemy)); //change speed of bullets here
+                }
             }
             tower.draw(g, angleToEnemy);
         }
-
-        if(fps == 30){
-            Projectile.shoot(5, angleToEnemy);
-        }
-        Projectile.draw(g);
+        
+        updateProjectiles(g);
     }
 
     public void preloadBackground(){
@@ -162,7 +161,20 @@ public class GameScreen extends JPanel{
             Enemy enemy = iterator.next();
             if (enemy.update()) {
                 iterator.remove();
-                System.out.println("Enemy reached the end and was removed.");
+                System.out.println("Enemy reached the end");
+            }
+        }
+    }
+
+    private void updateProjectiles(Graphics g){
+        Iterator<Projectile> projectileIterator = projectiles.iterator();
+        while (projectileIterator.hasNext()) {
+            Projectile projectile = projectileIterator.next();
+            projectile.update();
+            if (projectile.isOutOfBounds() || projectile.hasHitEnemy(enemies)) {
+                projectileIterator.remove();
+            } else {
+                projectile.draw(g);
             }
         }
     }
