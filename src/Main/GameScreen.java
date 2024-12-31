@@ -37,8 +37,8 @@ public class GameScreen extends JPanel implements KeyListener{
     private ArrayList<Tower> towers = new ArrayList<>();
     private ArrayList<Projectile> projectiles = new ArrayList<>();
     private ArrayList<String> words = new ArrayList<String>();
-    private ArrayList<Character> lettersTyped = new ArrayList<>();
-    private char[] randomWord;
+    private String wordTyped;
+    private String randomWord;
     private int fps = 0;
     private double angleToEnemy = 0;
 
@@ -50,6 +50,7 @@ public class GameScreen extends JPanel implements KeyListener{
         setupMouseListener();
         addKeyListener(this);
         setFocusable(true);
+        requestFocusInWindow();
         getWord();
     }
 
@@ -191,26 +192,24 @@ public class GameScreen extends JPanel implements KeyListener{
 
     @Override
     public void keyPressed(KeyEvent e) {
-        switch(e.getKeyCode()){
-            case 127:
-                lettersTyped.removeLast();
-                break;
-            default:
-            char keyChar = e.getKeyChar();
-            lettersTyped.add(keyChar);
-            break;
+        int buttonPressed = e.getKeyCode();
+        
+        if(buttonPressed == 8 && wordTyped.length() > 0){
+            wordTyped = wordTyped.substring(0, wordTyped.length()-1);
+        }else{
+            wordTyped += e.getKeyChar();
         }
-        System.out.println(lettersTyped.toString());
+        System.out.println(wordTyped);
         
         if(matchingWord()){
             getWord();
-            lettersTyped.clear();
+            wordTyped = "";
         }
     }
 
     public boolean matchingWord(){
-        for(int i = 0; i < randomWord.length; i++){
-            if(!lettersTyped.contains(randomWord[i])){
+        for(int i = 0; i < randomWord.length(); i++){
+            if(!wordTyped.equals(randomWord)){
                 return false;
             }
         }
@@ -234,15 +233,9 @@ public class GameScreen extends JPanel implements KeyListener{
             System.out.println("src/Main/words.txt");
         }
         
-        //temporarily assigns the random word
-        String word = randomWord();
-        randomWord = new char[word.length()];
-
-        for(int i = 0; i < word.length(); i++){
-            randomWord[i] = word.charAt(i);
-            System.out.println(randomWord[i]);
-        }
-
+        randomWord = randomWord();
+        wordTyped = "";
+        System.out.println(randomWord);
     }
 
     public String randomWord() {
