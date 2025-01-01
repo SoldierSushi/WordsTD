@@ -15,12 +15,20 @@ public class Game extends JFrame{
 
         importImg();
 
-        setSize(832,860);
+        setSize(932,860);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        //creating the new screens
         GameScreen gameScreen = new GameScreen(img);
+        MenuScreen menuScreen = new MenuScreen();
+
+        gameScreen.setBounds(0,0, 832, 860);
+        menuScreen.setBounds(832, 0, 100, 860);
+
         add(gameScreen);
+        add(menuScreen);
+
         setVisible(true);
     }
 

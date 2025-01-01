@@ -36,11 +36,11 @@ public class GameScreen extends JPanel implements KeyListener{
     private ArrayList<Enemy> enemies = new ArrayList<>();
     private ArrayList<Tower> towers = new ArrayList<>();
     private ArrayList<Projectile> projectiles = new ArrayList<>();
-    private ArrayList<String> words = new ArrayList<String>();
+    private ArrayList<String> words = new ArrayList<>();
     private String wordTyped;
     private String randomWord;
     private int fps = 0;
-    private double angleToEnemy = 0;
+    
 
     public GameScreen(BufferedImage img) {
         this.img = img;
@@ -105,7 +105,6 @@ public class GameScreen extends JPanel implements KeyListener{
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                System.out.println("Mouse clicked.");
                 int x = e.getX() / 64;
                 int y = e.getY() / 64;
 
@@ -122,6 +121,7 @@ public class GameScreen extends JPanel implements KeyListener{
          
     @Override
     public void paintComponent(Graphics g){
+        double angleToEnemy = 0;
         super.paintComponent(g);
 
         for(int y = 0; y < size; y++){
@@ -244,7 +244,7 @@ public class GameScreen extends JPanel implements KeyListener{
     }
 
     /*
-     * find key pressed
-     * check if key matches letter of the word
+     * make new panel to hold tower types
+     * 
      */
 }
