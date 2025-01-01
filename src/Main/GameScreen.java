@@ -2,18 +2,13 @@ package Main;
 
 import javax.swing.JPanel;
 import java.awt.event.MouseEvent;
-
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Scanner;
 
-public class GameScreen extends JPanel implements KeyListener{ 
+public class GameScreen extends JPanel{ 
     private BufferedImage img;
     private Image[][] backGroundImages;
     private int size = 13;
@@ -36,9 +31,6 @@ public class GameScreen extends JPanel implements KeyListener{
     private ArrayList<Enemy> enemies = new ArrayList<>();
     private ArrayList<Tower> towers = new ArrayList<>();
     private ArrayList<Projectile> projectiles = new ArrayList<>();
-    private ArrayList<String> words = new ArrayList<>();
-    private String wordTyped;
-    private String randomWord;
     private int fps = 0;
     
 
@@ -48,10 +40,8 @@ public class GameScreen extends JPanel implements KeyListener{
         preloadBackground();
         startGameThread();
         setupMouseListener();
-        addKeyListener(this);
-        setFocusable(true);
-        requestFocusInWindow();
-        getWord();
+
+        setBounds(0,0, 832, 860);
     }
 
     public void startGameThread(){
@@ -189,62 +179,4 @@ public class GameScreen extends JPanel implements KeyListener{
             }
         }
     }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-        int buttonPressed = e.getKeyCode();
-        
-        if(buttonPressed == 8 && wordTyped.length() > 0){
-            wordTyped = wordTyped.substring(0, wordTyped.length()-1);
-        }else{
-            wordTyped += e.getKeyChar();
-        }
-        System.out.println(wordTyped);
-        
-        if(matchingWord()){
-            getWord();
-            wordTyped = "";
-        }
-    }
-
-    public boolean matchingWord(){
-        for(int i = 0; i < randomWord.length(); i++){
-            if(!wordTyped.equals(randomWord)){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {}
-
-    @Override
-    public void keyTyped(KeyEvent e) {}
-
-    public void getWord(){
-        try {
-            Scanner input = new Scanner(new File("src/Main/words.txt"));
-            while (input.hasNextLine()) {
-                words.add(input.nextLine().trim());
-            }
-            input.close();
-        } catch (Exception e) {
-            System.out.println("src/Main/words.txt");
-        }
-        
-        randomWord = randomWord();
-        wordTyped = "";
-        System.out.println(randomWord);
-    }
-
-    public String randomWord() {
-        int index = (int) (Math.random() * words.size());
-        return words.get(index);
-    }
-
-    /*
-     * make new panel to hold tower types
-     * 
-     */
 }
