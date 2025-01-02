@@ -1,11 +1,14 @@
 package Main;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -13,35 +16,58 @@ public class MenuScreen extends JPanel implements KeyListener{
     private ArrayList<String> words = new ArrayList<>();
     private String wordTyped;
     private String randomWord;
+    private JLabel titleLabel;
+    private JLabel wordToType;
 
     public MenuScreen(){
+        //panel stuff
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)); // Stack components vertically
         setBounds(832, 0, 200, 860);
         addKeyListener(this);
         setFocusable(true);
         requestFocusInWindow();
 
-        JLabel wordToType = new JLabel();
+        //titleLabel stuff
+        titleLabel = new JLabel("MENU");
+        titleLabel.setBounds(840, 10, 180, 30);
+        titleLabel.setForeground(Color.BLACK); // Set text color
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        titleLabel.setAlignmentX(CENTER_ALIGNMENT);
+
+        //wordToType stuff
         getWord();
-        wordToType.setBounds(882, 820, 50, 25);
-        wordToType.setText(randomWord);
+        wordToType = new JLabel(randomWord);
+        wordToType.setBounds(840, 40, 50, 25);
+        wordToType.setForeground(Color.BLACK);
+        wordToType.setFont(new Font("Arial", Font.BOLD, 16));
+        wordToType.setAlignmentX(CENTER_ALIGNMENT);
         
+        //adding all to panel
+        add(titleLabel);
         add(wordToType);
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        int buttonPressed = e.getKeyCode();
         
-        if(buttonPressed == 8 && wordTyped.length() > 0){
-            wordTyped = wordTyped.substring(0, wordTyped.length()-1);
-        }else{
-            wordTyped += e.getKeyChar();
-        }
-        System.out.println(wordTyped);
-        
-        if(matchingWord()){
-            getWord();
-            wordTyped = "";
+        switch(e.getKeyCode()){
+            case KeyEvent.VK_BACK_SPACE:
+                if(!wordTyped.isEmpty()){
+                    wordTyped = wordTyped.substring(0, wordTyped.length()-1);
+                }
+                System.out.println(wordTyped);
+                break;
+            case KeyEvent.VK_ENTER:
+                if(matchingWord()){
+                    getWord();
+                    wordToType.setText(randomWord);
+                    wordTyped = "";
+                }
+                break;
+            default:
+                wordTyped += e.getKeyChar();
+                System.out.println(wordTyped);
+                break;
         }
     }
 

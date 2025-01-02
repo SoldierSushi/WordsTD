@@ -18,6 +18,7 @@ public class Game extends JFrame{
         setSize(1032,860);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        setLayout(null);
 
         //creating the new screens
         GameScreen gameScreen = new GameScreen(img);
