@@ -19,8 +19,10 @@ public class MenuScreen extends JPanel implements KeyListener{
     private String randomWord;
     private JLabel titleLabel;
     private JLabel wordToType;
+    private JLabel energyLabel;
     private JButton towerAttackButton;
     private static boolean towerAttackOn = false;
+    private int energy = 10;
 
     public MenuScreen(){
         //panel stuff
@@ -45,6 +47,14 @@ public class MenuScreen extends JPanel implements KeyListener{
         wordToType.setFont(new Font("Arial", Font.BOLD, 16));
         wordToType.setAlignmentX(CENTER_ALIGNMENT);
 
+        //energy label
+        energyLabel = new JLabel();
+        energyLabel.setBounds(840, 100, 50, 25);
+        energyLabel.setForeground(Color.BLACK);
+        energyLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        energyLabel.setAlignmentX(CENTER_ALIGNMENT);
+        displayEnergy();
+
         //towerAttackButton
         towerAttackButton = new JButton("Tower Attack");
         towerAttackButton.setBounds(840, 70, 50, 50);
@@ -59,33 +69,42 @@ public class MenuScreen extends JPanel implements KeyListener{
         add(titleLabel);
         add(wordToType);
         add(towerAttackButton);
+        add(energyLabel);
     }
 
+    //used in gamescreen for towerAttack
     public static boolean isTowerAttackOn(){return towerAttackOn;}
     public static void flipTowerAttackValue(){towerAttackOn = !towerAttackOn;}
 
+    public void subtractEnergy(){ energy--;}
+    public void displayEnergy(){ energyLabel.setText("" + energy);}
+
     @Override
     public void keyPressed(KeyEvent e) {
-        
-        switch(e.getKeyCode()){
-            case KeyEvent.VK_BACK_SPACE:
-                if(!wordTyped.isEmpty()){
-                    wordTyped = wordTyped.substring(0, wordTyped.length()-1);
-                }
-                System.out.println(wordTyped);
-                break;
-            case KeyEvent.VK_ENTER:
-                if(matchingWord()){
-                    getWord();
-                    wordToType.setText(randomWord);
-                    wordTyped = "";
-                }
-                break;
-            default:
-                wordTyped += e.getKeyChar();
-                System.out.println(wordTyped);
-                break;
+        if(energy > 0){
+            switch(e.getKeyCode()){
+                case KeyEvent.VK_BACK_SPACE:
+                    if(!wordTyped.isEmpty()){
+                        wordTyped = wordTyped.substring(0, wordTyped.length()-1);
+                    }
+                    System.out.println(wordTyped);
+                    subtractEnergy();
+                    break;
+                case KeyEvent.VK_ENTER:
+                    if(matchingWord()){
+                        getWord();
+                        wordToType.setText(randomWord);
+                        wordTyped = "";
+                    }
+                    break;
+                default:
+                    wordTyped += e.getKeyChar();
+                    System.out.println(wordTyped);
+                    subtractEnergy();
+                    break;
+            }
         }
+        displayEnergy();
     }
 
     public boolean matchingWord(){
