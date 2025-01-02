@@ -32,7 +32,6 @@ public class GameScreen extends JPanel{
     private ArrayList<Tower> towers = new ArrayList<>();
     private ArrayList<Projectile> projectiles = new ArrayList<>();
     private int fps = 0;
-    
 
     public GameScreen(BufferedImage img) {
         this.img = img;
@@ -95,14 +94,18 @@ public class GameScreen extends JPanel{
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int x = e.getX() / 64;
-                int y = e.getY() / 64;
+                System.out.println("mouse clicked");
+                if(MenuScreen.isTowerAttackOn()){
+                    int x = e.getX() / 64;
+                    int y = e.getY() / 64;
 
-                if (x >= 0 && x < size && y >= 0 && y < size) {
-                    if (map[y][x] == 0) { // Only place a tower on empty tiles
-                        map[y][x] = 2; // Mark the tile as occupied
-                        towers.add(new Tower(x, y, img.getSubimage(19 * 64, 10 * 64, 64, 64)));
+                    if (x >= 0 && x < size && y >= 0 && y < size) {
+                        if (map[y][x] == 0) { // Only place a tower on empty tiles
+                            map[y][x] = 2; // Mark the tile as occupied
+                            towers.add(new Tower(x, y, img.getSubimage(19 * 64, 10 * 64, 64, 64)));
+                        }
                     }
+                    MenuScreen.flipTowerAttackValue();
                 }
             }
         });

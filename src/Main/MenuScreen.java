@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -18,6 +19,8 @@ public class MenuScreen extends JPanel implements KeyListener{
     private String randomWord;
     private JLabel titleLabel;
     private JLabel wordToType;
+    private JButton towerAttackButton;
+    private static boolean towerAttackOn = false;
 
     public MenuScreen(){
         //panel stuff
@@ -41,11 +44,25 @@ public class MenuScreen extends JPanel implements KeyListener{
         wordToType.setForeground(Color.BLACK);
         wordToType.setFont(new Font("Arial", Font.BOLD, 16));
         wordToType.setAlignmentX(CENTER_ALIGNMENT);
+
+        //towerAttackButton
+        towerAttackButton = new JButton("Tower Attack");
+        towerAttackButton.setBounds(840, 70, 50, 50);
+        towerAttackButton.setForeground(Color.BLACK);
+        towerAttackButton.setFont(new Font("Arial", Font.BOLD, 16));
+        towerAttackButton.setAlignmentX(CENTER_ALIGNMENT);
+        towerAttackButton.addActionListener(e -> {
+            flipTowerAttackValue();
+        });
         
         //adding all to panel
         add(titleLabel);
         add(wordToType);
+        add(towerAttackButton);
     }
+
+    public static boolean isTowerAttackOn(){return towerAttackOn;}
+    public static void flipTowerAttackValue(){towerAttackOn = !towerAttackOn;}
 
     @Override
     public void keyPressed(KeyEvent e) {
