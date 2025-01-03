@@ -30,6 +30,7 @@ public class GameScreen extends JPanel{
 
     private ArrayList<Enemy> enemies = new ArrayList<>();
     private ArrayList<Tower> towers = new ArrayList<>();
+    private ArrayList<EnergyTower> energyTowers = new ArrayList<>();
     private ArrayList<Projectile> projectiles = new ArrayList<>();
     private int fps = 0;
 
@@ -106,6 +107,18 @@ public class GameScreen extends JPanel{
                         }
                     }
                     MenuScreen.flipTowerAttackValue();
+
+                }else if(MenuScreen.isEnergyTowerOn()){
+                    int x = e.getX() / 64;
+                    int y = e.getY() / 64;
+
+                    if (x >= 0 && x < size && y >= 0 && y < size) {
+                        if (map[y][x] == 0) {
+                            map[y][x] = 3;
+                            energyTowers.add(new EnergyTower(x, y, img.getSubimage(20 * 64, 10 * 64, 64, 64)));
+                        }
+                    }
+                    MenuScreen.flipEnergyTowerValue();
                 }
             }
         });
@@ -138,7 +151,14 @@ public class GameScreen extends JPanel{
             }
             tower.draw(g, angleToEnemy);
         }
-        
+
+        for(EnergyTower energyTower : energyTowers){
+            if(fps == 30){
+                MenuScreen.addEnergy();
+                MenuScreen.displayEnergy();
+            }
+            energyTower.draw(g);
+        }
         updateProjectiles(g);
     }
 

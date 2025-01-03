@@ -19,10 +19,12 @@ public class MenuScreen extends JPanel implements KeyListener{
     private String randomWord;
     private JLabel titleLabel;
     private JLabel wordToType;
-    private JLabel energyLabel;
+    private static JLabel energyLabel;
     private JButton towerAttackButton;
+    private JButton EnergyTowerButton;
     private static boolean towerAttackOn = false;
-    private int energy = 10;
+    private static boolean EnergyTowerOn = false;
+    private static int energy = 10;
 
     public MenuScreen(){
         //panel stuff
@@ -61,8 +63,19 @@ public class MenuScreen extends JPanel implements KeyListener{
         towerAttackButton.setForeground(Color.BLACK);
         towerAttackButton.setFont(new Font("Arial", Font.BOLD, 16));
         towerAttackButton.setAlignmentX(CENTER_ALIGNMENT);
+        towerAttackButton.setFocusable(false);
         towerAttackButton.addActionListener(e -> {
             flipTowerAttackValue();
+        });
+
+        EnergyTowerButton = new JButton("Tower Attack");
+        EnergyTowerButton.setBounds(840, 130, 50, 50);
+        EnergyTowerButton.setForeground(Color.BLACK);
+        EnergyTowerButton.setFont(new Font("Arial", Font.BOLD, 16));
+        EnergyTowerButton.setAlignmentX(CENTER_ALIGNMENT);
+        EnergyTowerButton.setFocusable(false);
+        EnergyTowerButton.addActionListener(e -> {
+            flipEnergyTowerValue();
         });
         
         //adding all to panel
@@ -70,14 +83,20 @@ public class MenuScreen extends JPanel implements KeyListener{
         add(wordToType);
         add(towerAttackButton);
         add(energyLabel);
+        add(EnergyTowerButton);
     }
 
     //used in gamescreen for towerAttack
     public static boolean isTowerAttackOn(){return towerAttackOn;}
     public static void flipTowerAttackValue(){towerAttackOn = !towerAttackOn;}
 
-    public void subtractEnergy(){ energy--;}
-    public void displayEnergy(){ energyLabel.setText("" + energy);}
+    //used in gamescreen for EnergyTower
+    public static boolean isEnergyTowerOn(){return EnergyTowerOn;}
+    public static void flipEnergyTowerValue(){EnergyTowerOn = !EnergyTowerOn;}
+
+    public static void subtractEnergy(){ energy--; }
+    public static void addEnergy(){ energy++; }
+    public static void displayEnergy(){ energyLabel.setText("" + energy); }
 
     @Override
     public void keyPressed(KeyEvent e) {
