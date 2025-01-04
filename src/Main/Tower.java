@@ -23,8 +23,10 @@ public class Tower {
         for (Enemy enemy : enemies) {
             double distance = Math.sqrt(Math.pow((enemy.getY() + 32) - (towerY * 64 + 32), 2) + Math.pow((enemy.getX() + 32) - (towerX * 64 + 32), 2));
             if (distance < minDistance) {
-                minDistance = distance;
-                nearest = enemy;
+                if(distance <= 160){
+                    minDistance = distance;
+                    nearest = enemy;
+                }
             }
         }
         return nearest;

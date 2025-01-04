@@ -7,6 +7,7 @@ import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.spi.CurrencyNameProvider;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -20,6 +21,7 @@ public class MenuScreen extends JPanel implements KeyListener{
     private JLabel titleLabel;
     private JLabel wordToType;
     private static JLabel energyLabel;
+    private JLabel currentWordTypingLabel;
     private JButton towerAttackButton;
     private JButton EnergyTowerButton;
     private static boolean towerAttackOn = false;
@@ -57,6 +59,12 @@ public class MenuScreen extends JPanel implements KeyListener{
         energyLabel.setAlignmentX(CENTER_ALIGNMENT);
         displayEnergy();
 
+        //CurrentWordTypingLabel
+        currentWordTypingLabel = new JLabel();
+        currentWordTypingLabel.setBounds(840, 100, 50, 25);
+        currentWordTypingLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        currentWordTypingLabel.setAlignmentX(CENTER_ALIGNMENT);
+
         //towerAttackButton
         towerAttackButton = new JButton("Tower Attack");
         towerAttackButton.setBounds(840, 70, 50, 50);
@@ -84,6 +92,7 @@ public class MenuScreen extends JPanel implements KeyListener{
         add(towerAttackButton);
         add(energyLabel);
         add(EnergyTowerButton);
+        add(currentWordTypingLabel);
     }
 
     //used in gamescreen for towerAttack
@@ -100,27 +109,34 @@ public class MenuScreen extends JPanel implements KeyListener{
 
     @Override
     public void keyPressed(KeyEvent e) {
+        int keyClicked = e.getKeyCode();
         if(energy > 0){
-            switch(e.getKeyCode()){
+            switch(keyClicked){
                 case KeyEvent.VK_BACK_SPACE:
                     if(!wordTyped.isEmpty()){
                         wordTyped = wordTyped.substring(0, wordTyped.length()-1);
                     }
-                    System.out.println(wordTyped);
                     subtractEnergy();
                     break;
                 case KeyEvent.VK_ENTER:
-                    if(matchingWord()){
-                        getWord();
-                        wordToType.setText(randomWord);
-                        wordTyped = "";
-                    }
                     break;
                 default:
                     wordTyped += e.getKeyChar();
-                    System.out.println(wordTyped);
                     subtractEnergy();
                     break;
+            }
+
+            if(wordTyped.isEmpty()){
+                currentWordTypingLabel.setText("");
+            }else{
+                changeLetterColor(wordTyped);
+            }
+
+            if(matchingWord()){
+                wordTyped = "";
+                currentWordTypingLabel.setText("");
+                getWord();
+                wordToType.setText(randomWord);
             }
         }
         displayEnergy();
@@ -160,6 +176,21 @@ public class MenuScreen extends JPanel implements KeyListener{
     public String randomWord() {
         int index = (int) (Math.random() * words.size());
         return words.get(index);
+    }
+
+    public void changeLetterColor(String wordTyped){
+        boolean lastLetterCorrect = true;
+
+        for(int i = 0; i < wordTyped.length(); i++){
+            if(wordTyped.charAt(i) != randomWord.charAt(i)){
+                currentWordTypingLabel.setForeground(Color.RED);
+                lastLetterCorrect = false;
+            }
+            if(lastLetterCorrect){
+                currentWordTypingLabel.setForeground(Color.BLACK);
+            }
+            currentWordTypingLabel.setText(wordTyped);
+        }
     }
 
     public static void main(String[] args) {
