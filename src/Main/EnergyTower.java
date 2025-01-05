@@ -7,39 +7,25 @@ public class EnergyTower {
     private BufferedImage image;
     private int towerY;
     private int towerX;
-    private int fps = 0;
+    private double energyRate;
+    private float timeSinceLastEnergy;
 
-    public EnergyTower(int towerX, int towerY, BufferedImage image){
+    public EnergyTower(int towerX, int towerY, BufferedImage image, double energyRate){
         this.towerX = towerX;
         this.towerY = towerY;
         this.image = image;
-
-        //makeEnergyGameThread();
+        this.energyRate = energyRate;
+        this.timeSinceLastEnergy = 0;
     }
 
-    /*public void makeEnergyGameThread(){
-        Thread makeEnergy = new Thread(new Runnable() {
-            @Override
-            public void run(){
-
-                if(fps == 15){
-                    System.out.println("works");
-                    MenuScreen.addEnergy();
-                    MenuScreen.displayEnergy();
-                }
-                fps++;
-
-                long frameTime = System.nanoTime();
-                    try {
-                        long sleepTime = Math.max(0, 33 - (System.nanoTime() - frameTime) / 1_000_000);
-                        Thread.sleep(sleepTime);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-            }
-        }, "makeEnergy");
-        makeEnergy.start();
-    }*/
+    public void harvestEnergy(float deltaTimeEnergy){
+        timeSinceLastEnergy += deltaTimeEnergy;
+        if(timeSinceLastEnergy >= energyRate){
+            MenuScreen.addEnergy();
+            MenuScreen.displayEnergy();
+            timeSinceLastEnergy = 0;
+        }
+    }
 
     public void draw(Graphics g) {
         int towerScreenX = towerX * 64;

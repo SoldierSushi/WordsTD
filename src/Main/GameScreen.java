@@ -34,6 +34,8 @@ public class GameScreen extends JPanel{
     private ArrayList<Projectile> projectiles = new ArrayList<>();
     private int fps = 0;
     private long lastUpdateTime;
+    private long lastUpdateTimeEnergy;
+    private long currentTimeEnergy;
 
     public GameScreen(BufferedImage img) {
         this.img = img;
@@ -105,7 +107,7 @@ public class GameScreen extends JPanel{
                     if (x >= 0 && x < size && y >= 0 && y < size) {
                         if (map[y][x] == 0) { // Only place a tower on empty tiles
                             map[y][x] = 2; // Mark the tile as occupied
-                            towers.add(new Tower(x, y, img.getSubimage(19 * 64, 10 * 64, 64, 64), 0.5));
+                            towers.add(new Tower(x, y, img.getSubimage(19 * 64, 10 * 64, 64, 64), 0.2));
                         }
                     }
                     MenuScreen.flipTowerAttackValue();
@@ -117,7 +119,7 @@ public class GameScreen extends JPanel{
                     if (x >= 0 && x < size && y >= 0 && y < size) {
                         if (map[y][x] == 0) {
                             map[y][x] = 3;
-                            energyTowers.add(new EnergyTower(x, y, img.getSubimage(20 * 64, 10 * 64, 64, 64)));
+                            energyTowers.add(new EnergyTower(x, y, img.getSubimage(20 * 64, 10 * 64, 64, 64),2));
                         }
                     }
                     MenuScreen.flipEnergyTowerValue();
@@ -164,12 +166,12 @@ public class GameScreen extends JPanel{
         }
 
         for(EnergyTower energyTower : energyTowers){
-            if(fps == 30){
-                MenuScreen.addEnergy();
-                MenuScreen.displayEnergy();
-            }
+            currentTimeEnergy = System.nanoTime();
+            float deltaTimeEnergy = (currentTimeEnergy - lastUpdateTimeEnergy) / 1_000_000_000.0f;  // Convert to seconds
+            energyTower.harvestEnergy(deltaTimeEnergy);
             energyTower.draw(g);
         }
+        lastUpdateTimeEnergy = currentTimeEnergy;
 
         if (projectiles != null) {
             updateProjectiles(g);

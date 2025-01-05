@@ -9,7 +9,7 @@ public class Tower {
     private BufferedImage image;
     private int towerY;
     private int towerX;
-    private double fireRate = 0.5;  // Time between shots (e.g., 1.0f = 1 second)
+    private double fireRate;
     private float timeSinceLastShot;
 
     public Tower(int towerX, int towerY, BufferedImage image, double fireRate) {
@@ -63,7 +63,7 @@ public class Tower {
     
     public int getY() { return towerY*64; }
 
-    public Projectile shoot(int speed, double angle, float deltaTime){ //not the most consistent method, runs from 10-15 frames
+    public Projectile shoot(int speed, double angle, float deltaTime){
         timeSinceLastShot += deltaTime;
         if (timeSinceLastShot >= fireRate) {
             double angleInRadians = Math.toRadians(angle);
