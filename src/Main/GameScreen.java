@@ -33,6 +33,7 @@ public class GameScreen extends JPanel{
     private ArrayList<EnergyTower> energyTowers = new ArrayList<>();
     private ArrayList<Projectile> projectiles = new ArrayList<>();
     private int fps = 0;
+    private long lastUpdateTime;
 
     public GameScreen(BufferedImage img) {
         this.img = img;
@@ -42,6 +43,7 @@ public class GameScreen extends JPanel{
         setupMouseListener();
 
         setBounds(0,0, 832, 860);
+        lastUpdateTime = System.nanoTime();
     }
 
     public void startGameThread(){
@@ -103,7 +105,7 @@ public class GameScreen extends JPanel{
                     if (x >= 0 && x < size && y >= 0 && y < size) {
                         if (map[y][x] == 0) { // Only place a tower on empty tiles
                             map[y][x] = 2; // Mark the tile as occupied
-                            towers.add(new Tower(x, y, img.getSubimage(19 * 64, 10 * 64, 64, 64)));
+                            towers.add(new Tower(x, y, img.getSubimage(19 * 64, 10 * 64, 64, 64), 0.5));
                         }
                     }
                     MenuScreen.flipTowerAttackValue();
@@ -141,14 +143,23 @@ public class GameScreen extends JPanel{
         }
 
         for(Tower tower : towers){
+
             Enemy nearestEnemy = tower.nearestEnemy(enemies);
             angleToEnemy = 0;
-            if (nearestEnemy != null) {
+
+            long currentTime = System.nanoTime();
+            float deltaTime = (currentTime - lastUpdateTime) / 1_000_000_000.0f;  // Convert to seconds
+            lastUpdateTime = currentTime;
+
+            if (nearestEnemy != null) { // posibly move this to Tower class
                 angleToEnemy = tower.angleToNearestEnemy(nearestEnemy);
-                if (fps == 30) {
-                    projectiles.add(tower.shoot(40, angleToEnemy)); //change speed of bullets here
+                Projectile newProjectile = tower.shoot(40, angleToEnemy, deltaTime);
+                if (newProjectile != null) {
+                    projectiles.add(newProjectile);
+                    System.out.println(fps);
                 }
             }
+            
             tower.draw(g, angleToEnemy);
         }
 
@@ -159,7 +170,10 @@ public class GameScreen extends JPanel{
             }
             energyTower.draw(g);
         }
-        updateProjectiles(g);
+
+        if (projectiles != null) {
+            updateProjectiles(g);
+        }
     }
 
     public void preloadBackground(){

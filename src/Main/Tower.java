@@ -9,11 +9,15 @@ public class Tower {
     private BufferedImage image;
     private int towerY;
     private int towerX;
+    private double fireRate = 0.5;  // Time between shots (e.g., 1.0f = 1 second)
+    private float timeSinceLastShot;
 
-    public Tower(int towerX, int towerY, BufferedImage image) {
+    public Tower(int towerX, int towerY, BufferedImage image, double fireRate) {
         this.towerX = towerX;
         this.towerY = towerY;
         this.image = image;
+        this.fireRate = fireRate;
+        this.timeSinceLastShot = 0;
     }
 
     public Enemy nearestEnemy(List<Enemy> enemies) {
@@ -59,12 +63,17 @@ public class Tower {
     
     public int getY() { return towerY*64; }
 
-    public Projectile shoot(int speed, double angle){
-        double angleInRadians = Math.toRadians(angle);
-        double velocityX = speed * Math.cos(angleInRadians);
-        double velocityY = speed * Math.sin(angleInRadians);
+    public Projectile shoot(int speed, double angle, float deltaTime){ //not the most consistent method, runs from 10-15 frames
+        timeSinceLastShot += deltaTime;
+        if (timeSinceLastShot >= fireRate) {
+            double angleInRadians = Math.toRadians(angle);
+            double velocityX = speed * Math.cos(angleInRadians);
+            double velocityY = speed * Math.sin(angleInRadians);
 
-        return new Projectile(towerX * 64 + 32, towerY * 64 + 32, velocityX, velocityY);
+            timeSinceLastShot = 0;
+            return new Projectile(towerX * 64 + 32, towerY * 64 + 32, velocityX, velocityY);
+        }
+        return null;
     }
 
     public void draw(Graphics g, double angleToEnemy) {

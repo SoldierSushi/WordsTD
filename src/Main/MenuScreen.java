@@ -118,8 +118,6 @@ public class MenuScreen extends JPanel implements KeyListener{
                     }
                     subtractEnergy();
                     break;
-                case KeyEvent.VK_ENTER:
-                    break;
                 default:
                     wordTyped += e.getKeyChar();
                     subtractEnergy();
