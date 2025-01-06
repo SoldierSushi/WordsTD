@@ -76,7 +76,7 @@ public class MenuScreen extends JPanel implements KeyListener{
             flipTowerAttackValue();
         });
 
-        EnergyTowerButton = new JButton("Tower Attack");
+        EnergyTowerButton = new JButton("Energy Tower");
         EnergyTowerButton.setBounds(840, 130, 50, 50);
         EnergyTowerButton.setForeground(Color.BLACK);
         EnergyTowerButton.setFont(new Font("Arial", Font.BOLD, 16));

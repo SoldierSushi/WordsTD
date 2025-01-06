@@ -34,6 +34,7 @@ public class GameScreen extends JPanel{
     private ArrayList<Projectile> projectiles = new ArrayList<>();
     private int fps = 0;
     private long lastUpdateTime;
+    private long currentTime;
     private long lastUpdateTimeEnergy;
     private long currentTimeEnergy;
 
@@ -149,21 +150,20 @@ public class GameScreen extends JPanel{
             Enemy nearestEnemy = tower.nearestEnemy(enemies);
             angleToEnemy = 0;
 
-            long currentTime = System.nanoTime();
+            currentTime = System.nanoTime();
             float deltaTime = (currentTime - lastUpdateTime) / 1_000_000_000.0f;  // Convert to seconds
-            lastUpdateTime = currentTime;
 
             if (nearestEnemy != null) { // posibly move this to Tower class
                 angleToEnemy = tower.angleToNearestEnemy(nearestEnemy);
                 Projectile newProjectile = tower.shoot(40, angleToEnemy, deltaTime);
                 if (newProjectile != null) {
                     projectiles.add(newProjectile);
-                    System.out.println(fps);
                 }
             }
             
             tower.draw(g, angleToEnemy);
         }
+        lastUpdateTime = currentTime;
 
         for(EnergyTower energyTower : energyTowers){
             currentTimeEnergy = System.nanoTime();
