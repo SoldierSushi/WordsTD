@@ -22,7 +22,7 @@ public class MenuScreen extends JPanel implements KeyListener{
     private JLabel currentWordTypingLabel;
     private JButton towerAttackButton;
     private JButton EnergyTowerButton;
-    private JButton PlayButton;
+    private static JButton PlayButton;
     private static boolean towerAttackOn = false;
     private static boolean EnergyTowerOn = false;
     private static int energy = 10;
@@ -225,6 +225,10 @@ public class MenuScreen extends JPanel implements KeyListener{
             }
             currentWordTypingLabel.setText(wordTyped);
         }
+    }
+
+    public static void resetPlayButton(){
+        PlayButton.setText("Play");
     }
 
     public static void main(String[] args) {

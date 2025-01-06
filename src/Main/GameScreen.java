@@ -211,6 +211,7 @@ public class GameScreen extends JPanel{
                 iterator.remove();
                 System.out.println("Enemy killed");
             }
+            checkWaveComplete();
         }
     }
 
@@ -239,9 +240,10 @@ public class GameScreen extends JPanel{
 
     public static void checkWaveComplete(){
         if(enemies.isEmpty()){
-            System.out.println("wave complete");
+            System.out.println("wave " + (wave + 1) + " complete");
             wave++;
             MenuScreen.flipPlayOn();
+            MenuScreen.resetPlayButton();
         }
     }
     //add waves to the game

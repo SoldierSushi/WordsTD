@@ -60,7 +60,6 @@ public class Enemy {
 
     public boolean isEnemyDead(){
         if(health == 0){
-            GameScreen.checkWaveComplete();
             return true;
         }
         return false;
