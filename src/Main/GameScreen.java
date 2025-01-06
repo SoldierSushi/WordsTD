@@ -1,5 +1,6 @@
 package Main;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import java.awt.event.MouseEvent;
 import java.awt.*;
@@ -38,6 +39,7 @@ public class GameScreen extends JPanel{
     private long lastUpdateTimeEnergy;
     private long currentTimeEnergy;
     private static int wave = 0;
+    private int userHP = 3;
 
     public GameScreen(BufferedImage img, MenuScreen menuScreen) {
         this.img = img;
@@ -205,6 +207,7 @@ public class GameScreen extends JPanel{
         while (iterator.hasNext()) {
             Enemy enemy = iterator.next();
             if (enemy.update()) {
+                userLoseHP();
                 iterator.remove();
                 System.out.println("Enemy reached the end");
             }else if(enemy.isEnemyDead()){
@@ -246,6 +249,14 @@ public class GameScreen extends JPanel{
             MenuScreen.resetPlayButton();
         }
     }
-    //add waves to the game
+
+    public void userLoseHP(){
+        userHP--;
+        if(userHP <= 0){
+            JOptionPane.showMessageDialog(null, "You lost, better luck next time!", "You Lose", JOptionPane.INFORMATION_MESSAGE);
+            System.exit(0);
+        }
+    }
+    
 
 }
