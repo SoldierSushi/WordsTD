@@ -21,8 +21,8 @@ public class Game extends JFrame{
         setLayout(null);
 
         //creating the new screens
-        GameScreen gameScreen = new GameScreen(img);
         MenuScreen menuScreen = new MenuScreen();
+        GameScreen gameScreen = new GameScreen(img, menuScreen);
 
         add(gameScreen);
         add(menuScreen);

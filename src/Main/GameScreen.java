@@ -38,7 +38,7 @@ public class GameScreen extends JPanel{
     private long lastUpdateTimeEnergy;
     private long currentTimeEnergy;
 
-    public GameScreen(BufferedImage img) {
+    public GameScreen(BufferedImage img, MenuScreen menuScreen) {
         this.img = img;
 
         preloadBackground();
@@ -47,6 +47,8 @@ public class GameScreen extends JPanel{
 
         setBounds(0,0, 832, 860);
         lastUpdateTime = System.nanoTime();
+        
+        menuScreen.setWordCompletedCallback(() -> damageFirstEnemy(menuScreen.getWordTyped().length()));
     }
 
     public void startGameThread(){
@@ -61,11 +63,11 @@ public class GameScreen extends JPanel{
 
                 while(true){
                     //Spawns enemies in intervals
-                    long currentTime = System.nanoTime();
-                    if (currentTime - lastSpawnTime >= spawnInterval) {
+                    long currentSpawnTime = System.nanoTime();
+                    if (currentSpawnTime - lastSpawnTime >= spawnInterval) {
                         if(enemyCounter < 4){
                             enemies.add(new Enemy(0, 64, img.getSubimage(20 * 64, 6 * 64, 64, 64)));
-                            lastSpawnTime = currentTime;
+                            lastSpawnTime = currentSpawnTime;
                             enemyCounter++;
                         }
                     }
@@ -202,6 +204,16 @@ public class GameScreen extends JPanel{
             if (enemy.update()) {
                 iterator.remove();
                 System.out.println("Enemy reached the end");
+            }
+        }
+    }
+
+    public void damageFirstEnemy(int damage) {
+        if (!enemies.isEmpty()) {
+            Enemy firstEnemy = enemies.get(0);
+            if (firstEnemy.takeDamage(damage)) {
+                enemies.remove(firstEnemy); // Remove if health is 0
+                System.out.println("Enemy with text!");
             }
         }
     }

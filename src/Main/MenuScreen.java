@@ -7,8 +7,6 @@ import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.spi.CurrencyNameProvider;
-
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -16,7 +14,7 @@ import javax.swing.JPanel;
 
 public class MenuScreen extends JPanel implements KeyListener{
     private ArrayList<String> words = new ArrayList<>();
-    private String wordTyped;
+    private String wordTyped = "";
     private String randomWord;
     private JLabel titleLabel;
     private JLabel wordToType;
@@ -27,6 +25,7 @@ public class MenuScreen extends JPanel implements KeyListener{
     private static boolean towerAttackOn = false;
     private static boolean EnergyTowerOn = false;
     private static int energy = 10;
+    private Runnable wordCompletedCallback;
 
     public MenuScreen(){
         //panel stuff
@@ -130,7 +129,11 @@ public class MenuScreen extends JPanel implements KeyListener{
                 changeLetterColor(wordTyped);
             }
 
-            if(matchingWord()){
+            if(matchingWord()){ //callback needs to be run first because wordTyped resets to "" after being correct 
+                if (wordCompletedCallback != null) {
+                    wordCompletedCallback.run();
+                }
+
                 wordTyped = "";
                 currentWordTypingLabel.setText("");
                 getWord();
@@ -147,6 +150,14 @@ public class MenuScreen extends JPanel implements KeyListener{
             }
         }
         return true;
+    }
+
+    public void setWordCompletedCallback(Runnable callback) {
+        this.wordCompletedCallback = callback;
+    }
+
+    public String getWordTyped() {
+        return wordTyped;
     }
 
     @Override
