@@ -22,10 +22,13 @@ public class MenuScreen extends JPanel implements KeyListener{
     private JLabel currentWordTypingLabel;
     private JButton towerAttackButton;
     private JButton EnergyTowerButton;
+    private JButton PlayButton;
     private static boolean towerAttackOn = false;
     private static boolean EnergyTowerOn = false;
     private static int energy = 10;
     private Runnable wordCompletedCallback;
+    private Runnable startGameCallback;
+    private static boolean play = false;
 
     public MenuScreen(){
         //panel stuff
@@ -84,6 +87,20 @@ public class MenuScreen extends JPanel implements KeyListener{
         EnergyTowerButton.addActionListener(e -> {
             flipEnergyTowerValue();
         });
+
+        PlayButton = new JButton("Play");
+        PlayButton.setBounds(840, 750, 50, 50);
+        PlayButton.setForeground(Color.BLACK);
+        PlayButton.setFont(new Font("Arial", Font.BOLD, 16));
+        PlayButton.setAlignmentX(CENTER_ALIGNMENT);
+        PlayButton.setFocusable(false);
+        PlayButton.addActionListener(e -> {
+            if (startGameCallback != null && !play) {
+                play = true;
+                startGameCallback.run();
+                PlayButton.setText("Running");
+            }
+        });
         
         //adding all to panel
         add(titleLabel);
@@ -92,6 +109,7 @@ public class MenuScreen extends JPanel implements KeyListener{
         add(energyLabel);
         add(EnergyTowerButton);
         add(currentWordTypingLabel);
+        add(PlayButton);
     }
 
     //used in gamescreen for towerAttack
@@ -105,6 +123,9 @@ public class MenuScreen extends JPanel implements KeyListener{
     public static void subtractEnergy(){ energy--; }
     public static void addEnergy(){ energy++; }
     public static void displayEnergy(){ energyLabel.setText("" + energy); }
+
+    public static boolean isGameTrue(){ return play; }
+    public static void flipPlayOn(){ play = !play; }
 
     @Override
     public void keyPressed(KeyEvent e) {
@@ -154,6 +175,10 @@ public class MenuScreen extends JPanel implements KeyListener{
 
     public void setWordCompletedCallback(Runnable callback) {
         this.wordCompletedCallback = callback;
+    }
+
+    public void startGameCallback(Runnable callback) {
+        this.startGameCallback = callback;
     }
 
     public String getWordTyped() {

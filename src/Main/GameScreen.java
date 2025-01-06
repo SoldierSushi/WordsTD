@@ -28,7 +28,7 @@ public class GameScreen extends JPanel{
         {0,1,1,1,1,1,1,1,1,1,1,1,9},
     };
 
-    private ArrayList<Enemy> enemies = new ArrayList<>();
+    private static ArrayList<Enemy> enemies = new ArrayList<>();
     private ArrayList<Tower> towers = new ArrayList<>();
     private ArrayList<EnergyTower> energyTowers = new ArrayList<>();
     private ArrayList<Projectile> projectiles = new ArrayList<>();
@@ -37,6 +37,7 @@ public class GameScreen extends JPanel{
     private long currentTime;
     private long lastUpdateTimeEnergy;
     private long currentTimeEnergy;
+    private static int wave = 0;
 
     public GameScreen(BufferedImage img, MenuScreen menuScreen) {
         this.img = img;
@@ -49,6 +50,7 @@ public class GameScreen extends JPanel{
         lastUpdateTime = System.nanoTime();
         
         menuScreen.setWordCompletedCallback(() -> damageFirstEnemy(menuScreen.getWordTyped().length()));
+        menuScreen.startGameCallback(this::startGameThread);
     }
 
     public void startGameThread(){
@@ -56,12 +58,13 @@ public class GameScreen extends JPanel{
         Thread gameThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                System.out.println("Game thread started. Game state: " + MenuScreen.isGameTrue());
                 fps = 0;
                 long spawnInterval = 1000000000; // 1 second in nanoseconds
                 long lastSpawnTime = System.nanoTime();
                 int enemyCounter = 0;
 
-                while(true){
+                while(MenuScreen.isGameTrue()){
                     //Spawns enemies in intervals
                     long currentSpawnTime = System.nanoTime();
                     if (currentSpawnTime - lastSpawnTime >= spawnInterval) {
@@ -122,7 +125,7 @@ public class GameScreen extends JPanel{
                     if (x >= 0 && x < size && y >= 0 && y < size) {
                         if (map[y][x] == 0) {
                             map[y][x] = 3;
-                            energyTowers.add(new EnergyTower(x, y, img.getSubimage(20 * 64, 10 * 64, 64, 64),2));
+                            energyTowers.add(new EnergyTower(x, y, img.getSubimage(20 * 64, 10 * 64, 64, 64), 1));
                         }
                     }
                     MenuScreen.flipEnergyTowerValue();
@@ -204,6 +207,9 @@ public class GameScreen extends JPanel{
             if (enemy.update()) {
                 iterator.remove();
                 System.out.println("Enemy reached the end");
+            }else if(enemy.isEnemyDead()){
+                iterator.remove();
+                System.out.println("Enemy killed");
             }
         }
     }
@@ -230,4 +236,14 @@ public class GameScreen extends JPanel{
             }
         }
     }
+
+    public static void checkWaveComplete(){
+        if(enemies.isEmpty()){
+            System.out.println("wave complete");
+            wave++;
+            MenuScreen.flipPlayOn();
+        }
+    }
+    //add waves to the game
+
 }

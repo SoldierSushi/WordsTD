@@ -54,11 +54,15 @@ public class Enemy {
         }else{
             return true; 
         }
-        
+
+        return false;
+    }
+
+    public boolean isEnemyDead(){
         if(health == 0){
+            GameScreen.checkWaveComplete();
             return true;
         }
-
         return false;
     }
 
