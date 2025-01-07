@@ -91,9 +91,9 @@ public class Enemy {
     }
 
     public boolean takeDamage(int damage) {
-        System.out.println("enemy health:" + health);
         health -= damage;
-        return health <= 0;
+        if (health < 0) health = 0;
+        return health == 0;
     }
 
     public void draw(Graphics g) {

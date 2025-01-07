@@ -38,7 +38,7 @@ public class GameScreen extends JPanel{
     private long currentTime;
     private long lastUpdateTimeEnergy;
     private long currentTimeEnergy;
-    private static int wave = 7;
+    private static int wave = 100;
     private int userHP = 3;
     private static int enemyCounter = 0;
     private long lastSpawnTime = 0;
@@ -270,6 +270,8 @@ public class GameScreen extends JPanel{
             System.exit(0);
         }
     }
+
+    public int getWave(){ return wave; }
 }
 /*
  * make enemies increase with waves
@@ -279,6 +281,5 @@ public class GameScreen extends JPanel{
  * add tower upgrades (range, atk speed, damage)
  * add different types of towers
  * display waves to user
- * game thinks that wave is cleared if first enemy is killed, need to change that
- * fix glitch where some enemies are invincible
+ * make it so that user can place towers outside of the game loop
  */

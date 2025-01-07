@@ -7,7 +7,6 @@ import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -20,6 +19,7 @@ public class MenuScreen extends JPanel implements KeyListener{
     private JLabel wordToType;
     private static JLabel energyLabel;
     private JLabel currentWordTypingLabel;
+    private JLabel shopTitleLabel;
     private JButton towerAttackButton;
     private JButton EnergyTowerButton;
     private static JButton PlayButton;
@@ -32,7 +32,7 @@ public class MenuScreen extends JPanel implements KeyListener{
 
     public MenuScreen(){
         //panel stuff
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)); // Stack components vertically
+        setLayout(null); // Stack components vertically
         setBounds(832, 0, 200, 860);
         addKeyListener(this);
         setFocusable(true);
@@ -40,48 +40,54 @@ public class MenuScreen extends JPanel implements KeyListener{
 
         //titleLabel stuff
         titleLabel = new JLabel("MENU");
-        titleLabel.setBounds(840, 10, 180, 30);
+        titleLabel.setBounds(45, 0, 120, 50);
         titleLabel.setForeground(Color.BLACK); // Set text color
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        titleLabel.setFont(new Font("Georgia", Font.BOLD, 32));
         titleLabel.setAlignmentX(CENTER_ALIGNMENT);
 
         //wordToType stuff
         getWord();
         wordToType = new JLabel(randomWord);
-        wordToType.setBounds(840, 40, 50, 25);
+        wordToType.setBounds(0, 50,200, 25);
         wordToType.setForeground(Color.BLACK);
-        wordToType.setFont(new Font("Arial", Font.BOLD, 16));
+        wordToType.setFont(new Font("Georgia", Font.BOLD, 16));
         wordToType.setAlignmentX(CENTER_ALIGNMENT);
 
         //energy label
         energyLabel = new JLabel();
-        energyLabel.setBounds(840, 100, 50, 25);
+        energyLabel.setBounds(0, 100, 200, 25);
         energyLabel.setForeground(Color.BLACK);
-        energyLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        energyLabel.setFont(new Font("Georgia", Font.BOLD, 16));
         energyLabel.setAlignmentX(CENTER_ALIGNMENT);
         displayEnergy();
 
         //CurrentWordTypingLabel
         currentWordTypingLabel = new JLabel();
-        currentWordTypingLabel.setBounds(840, 100, 50, 25);
-        currentWordTypingLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        currentWordTypingLabel.setBounds(0, 150, 200, 25);
+        currentWordTypingLabel.setFont(new Font("Georgia", Font.BOLD, 16));
         currentWordTypingLabel.setAlignmentX(CENTER_ALIGNMENT);
 
+        shopTitleLabel = new JLabel("SHOP");
+        shopTitleLabel.setBounds(65, 400, 125, 25);
+        shopTitleLabel.setForeground(Color.BLACK);
+        shopTitleLabel.setFont(new Font("Georgia", Font.BOLD, 24));
+        shopTitleLabel.setAlignmentX(CENTER_ALIGNMENT);
+
         //towerAttackButton
-        towerAttackButton = new JButton("Tower Attack");
-        towerAttackButton.setBounds(840, 70, 50, 50);
+        towerAttackButton = new JButton("Tower Attack ($10)");
+        towerAttackButton.setBounds(0, 425, 200, 50);
         towerAttackButton.setForeground(Color.BLACK);
-        towerAttackButton.setFont(new Font("Arial", Font.BOLD, 16));
+        towerAttackButton.setFont(new Font("Georgia", Font.BOLD, 16));
         towerAttackButton.setAlignmentX(CENTER_ALIGNMENT);
         towerAttackButton.setFocusable(false);
         towerAttackButton.addActionListener(e -> {
             flipTowerAttackValue();
         });
 
-        EnergyTowerButton = new JButton("Energy Tower");
-        EnergyTowerButton.setBounds(840, 130, 50, 50);
+        EnergyTowerButton = new JButton("Energy Tower ($100)");
+        EnergyTowerButton.setBounds(0, 475, 200, 50);
         EnergyTowerButton.setForeground(Color.BLACK);
-        EnergyTowerButton.setFont(new Font("Arial", Font.BOLD, 16));
+        EnergyTowerButton.setFont(new Font("Georgia", Font.BOLD, 16));
         EnergyTowerButton.setAlignmentX(CENTER_ALIGNMENT);
         EnergyTowerButton.setFocusable(false);
         EnergyTowerButton.addActionListener(e -> {
@@ -89,9 +95,9 @@ public class MenuScreen extends JPanel implements KeyListener{
         });
 
         PlayButton = new JButton("Play");
-        PlayButton.setBounds(840, 750, 50, 50);
+        PlayButton.setBounds(0, 732, 200, 100);
         PlayButton.setForeground(Color.BLACK);
-        PlayButton.setFont(new Font("Arial", Font.BOLD, 16));
+        PlayButton.setFont(new Font("Georgia", Font.BOLD, 16));
         PlayButton.setAlignmentX(CENTER_ALIGNMENT);
         PlayButton.setFocusable(false);
         PlayButton.addActionListener(e -> {
@@ -110,6 +116,7 @@ public class MenuScreen extends JPanel implements KeyListener{
         add(EnergyTowerButton);
         add(currentWordTypingLabel);
         add(PlayButton);
+        add(shopTitleLabel);
     }
 
     //used in gamescreen for towerAttack
@@ -122,7 +129,7 @@ public class MenuScreen extends JPanel implements KeyListener{
 
     public static void subtractEnergy(){ energy--; }
     public static void addEnergy(){ energy++; }
-    public static void displayEnergy(){ energyLabel.setText("" + energy); }
+    public static void displayEnergy(){ energyLabel.setText("Typing Energy: " + energy); }
 
     public static boolean isGameTrue(){ return play; }
     public static void flipPlayOn(){ play = !play; }
