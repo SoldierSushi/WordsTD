@@ -38,7 +38,7 @@ public class GameScreen extends JPanel{
     private long currentTime;
     private long lastUpdateTimeEnergy;
     private long currentTimeEnergy;
-    private static int wave = 1;
+    private static int wave = 7;
     private int userHP = 3;
     private static int enemyCounter = 0;
     private long lastSpawnTime = 0;
@@ -215,13 +215,13 @@ public class GameScreen extends JPanel{
             Iterator<Enemy> iterator = enemies.iterator();
             while (iterator.hasNext()) {
                 Enemy enemy = iterator.next();
-                if (enemy.update()) {
+                if(enemy.isEnemyDead()){
+                    iterator.remove();
+                    System.out.println("Enemy killed");
+                }else if (enemy.update()) {
                     userLoseHP();
                     iterator.remove();
                     System.out.println("Enemy reached the end");
-                }else if(enemy.isEnemyDead()){
-                    iterator.remove();
-                    System.out.println("Enemy killed");
                 }
                 checkWaveComplete();
             }

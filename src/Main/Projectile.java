@@ -40,6 +40,6 @@ public class Projectile {
 
     public void draw(Graphics g) {
         g.setColor(Color.YELLOW);
-        g.fillOval((int) x - 2, (int) y - 2, 4, 4);
+        g.fillRect((int) x - 2, (int) y - 2, 4, 4);
     }
 }

@@ -91,6 +91,7 @@ public class Enemy {
     }
 
     public boolean takeDamage(int damage) {
+        System.out.println("enemy health:" + health);
         health -= damage;
         return health <= 0;
     }
