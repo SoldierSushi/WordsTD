@@ -42,6 +42,7 @@ public class GameScreen extends JPanel{
     private int userHP = 3;
     private static int enemyCounter = 0;
     private long lastSpawnTime = 0;
+    private static boolean allEnemiesMade = false;
     
         public GameScreen(BufferedImage img, MenuScreen menuScreen) {
             this.img = img;
@@ -153,7 +154,7 @@ public class GameScreen extends JPanel{
                 currentTime = System.nanoTime();
                 float deltaTime = (currentTime - lastUpdateTime) / 1_000_000_000.0f;  // Convert to seconds
     
-                if (nearestEnemy != null) { // posibly move this to Tower class
+                if (nearestEnemy != null) {
                     angleToEnemy = tower.angleToNearestEnemy(nearestEnemy);
                     Projectile newProjectile = tower.shoot(40, angleToEnemy, deltaTime);
                     if (newProjectile != null) {
@@ -204,6 +205,9 @@ public class GameScreen extends JPanel{
                         enemyCounter++;
                     }
                 }
+                if(enemyCounter == (amountOfEnemies - 1)){
+                    allEnemiesMade = true;
+                }
         }
     
         private void updateEnemies() {
@@ -248,14 +252,14 @@ public class GameScreen extends JPanel{
         }
     
         public static void checkWaveComplete(){
-            if(enemies.isEmpty()){
+            if(enemies.isEmpty() && allEnemiesMade){
                 System.out.println("wave " + wave + " complete");
                 wave++;
                 enemies.clear();
                 MenuScreen.flipPlayOn();
                 MenuScreen.resetPlayButton();
                 enemyCounter = 0;
-            
+                allEnemiesMade = false;
         }
     }
 
@@ -274,6 +278,7 @@ public class GameScreen extends JPanel{
  * display userHP
  * add tower upgrades (range, atk speed, damage)
  * add different types of towers
- * 
+ * display waves to user
  * game thinks that wave is cleared if first enemy is killed, need to change that
+ * fix glitch where some enemies are invincible
  */

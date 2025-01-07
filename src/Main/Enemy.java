@@ -32,7 +32,7 @@ public class Enemy {
         this.image = image;
         this.mapX = enemyX / 64;
         this.mapY = enemyY / 64;
-        this.health = health;
+        this.health = 1;
     }
 
     public boolean update() {
@@ -87,7 +87,7 @@ public class Enemy {
     }
 
     public Rectangle getBounds() {
-        return new Rectangle(enemyX, enemyY, 64, 64); // Assuming enemy size is 64x64 pixels
+        return new Rectangle(enemyX, enemyY, 64, 64);
     }
 
     public boolean takeDamage(int damage) {
