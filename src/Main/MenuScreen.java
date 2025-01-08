@@ -10,6 +10,7 @@ import java.util.Scanner;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 public class MenuScreen extends JPanel implements KeyListener{
     private ArrayList<String> words = new ArrayList<>();
@@ -17,6 +18,7 @@ public class MenuScreen extends JPanel implements KeyListener{
     private String randomWord;
     private JLabel titleLabel;
     private JLabel wordToType;
+    private JLabel wordToTypeTitle;
     private static JLabel energyLabel;
     private JLabel currentWordTypingLabel;
     private JLabel shopTitleLabel;
@@ -39,46 +41,46 @@ public class MenuScreen extends JPanel implements KeyListener{
         requestFocusInWindow();
 
         //titleLabel stuff
-        titleLabel = new JLabel("MENU");
-        titleLabel.setBounds(45, 0, 120, 50);
+        titleLabel = new JLabel("MENU", SwingConstants.CENTER);
+        titleLabel.setBounds(0, 0, 200, 50);
         titleLabel.setForeground(Color.BLACK); // Set text color
         titleLabel.setFont(new Font("Georgia", Font.BOLD, 32));
-        titleLabel.setAlignmentX(CENTER_ALIGNMENT);
 
         //wordToType stuff
         getWord();
-        wordToType = new JLabel(randomWord);
-        wordToType.setBounds(0, 50,200, 25);
+        wordToType = new JLabel(randomWord, SwingConstants.CENTER);
+        wordToType.setBounds(0, 150,200, 25);
         wordToType.setForeground(Color.BLACK);
         wordToType.setFont(new Font("Georgia", Font.BOLD, 16));
-        wordToType.setAlignmentX(CENTER_ALIGNMENT);
+
+        wordToTypeTitle = new JLabel("TYPING", SwingConstants.CENTER);
+        wordToTypeTitle.setBounds(0, 100, 200, 25);
+        wordToTypeTitle.setForeground(Color.BLACK);
+        wordToTypeTitle.setFont(new Font("Georgia", Font.BOLD, 24));
 
         //energy label
         energyLabel = new JLabel();
-        energyLabel.setBounds(0, 100, 200, 25);
+        energyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        energyLabel.setBounds(0, 125, 200, 25);
         energyLabel.setForeground(Color.BLACK);
         energyLabel.setFont(new Font("Georgia", Font.BOLD, 16));
-        energyLabel.setAlignmentX(CENTER_ALIGNMENT);
         displayEnergy();
 
         //CurrentWordTypingLabel
-        currentWordTypingLabel = new JLabel();
-        currentWordTypingLabel.setBounds(0, 150, 200, 25);
+        currentWordTypingLabel = new JLabel("...", SwingConstants.CENTER);
+        currentWordTypingLabel.setBounds(0, 175, 200, 25);
         currentWordTypingLabel.setFont(new Font("Georgia", Font.BOLD, 16));
-        currentWordTypingLabel.setAlignmentX(CENTER_ALIGNMENT);
 
-        shopTitleLabel = new JLabel("SHOP");
-        shopTitleLabel.setBounds(65, 400, 125, 25);
+        shopTitleLabel = new JLabel("SHOP", SwingConstants.CENTER);
+        shopTitleLabel.setBounds(0, 400, 200, 25);
         shopTitleLabel.setForeground(Color.BLACK);
         shopTitleLabel.setFont(new Font("Georgia", Font.BOLD, 24));
-        shopTitleLabel.setAlignmentX(CENTER_ALIGNMENT);
 
         //towerAttackButton
         towerAttackButton = new JButton("Tower Attack ($10)");
         towerAttackButton.setBounds(0, 425, 200, 50);
         towerAttackButton.setForeground(Color.BLACK);
         towerAttackButton.setFont(new Font("Georgia", Font.BOLD, 16));
-        towerAttackButton.setAlignmentX(CENTER_ALIGNMENT);
         towerAttackButton.setFocusable(false);
         towerAttackButton.addActionListener(e -> {
             flipTowerAttackValue();
@@ -88,7 +90,6 @@ public class MenuScreen extends JPanel implements KeyListener{
         EnergyTowerButton.setBounds(0, 475, 200, 50);
         EnergyTowerButton.setForeground(Color.BLACK);
         EnergyTowerButton.setFont(new Font("Georgia", Font.BOLD, 16));
-        EnergyTowerButton.setAlignmentX(CENTER_ALIGNMENT);
         EnergyTowerButton.setFocusable(false);
         EnergyTowerButton.addActionListener(e -> {
             flipEnergyTowerValue();
@@ -98,7 +99,6 @@ public class MenuScreen extends JPanel implements KeyListener{
         PlayButton.setBounds(0, 732, 200, 100);
         PlayButton.setForeground(Color.BLACK);
         PlayButton.setFont(new Font("Georgia", Font.BOLD, 16));
-        PlayButton.setAlignmentX(CENTER_ALIGNMENT);
         PlayButton.setFocusable(false);
         PlayButton.addActionListener(e -> {
             if (startGameCallback != null && !play) {
@@ -111,6 +111,7 @@ public class MenuScreen extends JPanel implements KeyListener{
         //adding all to panel
         add(titleLabel);
         add(wordToType);
+        add(wordToTypeTitle);
         add(towerAttackButton);
         add(energyLabel);
         add(EnergyTowerButton);
@@ -127,9 +128,8 @@ public class MenuScreen extends JPanel implements KeyListener{
     public static boolean isEnergyTowerOn(){return EnergyTowerOn;}
     public static void flipEnergyTowerValue(){EnergyTowerOn = !EnergyTowerOn;}
 
-    public static void subtractEnergy(){ energy--; }
     public static void addEnergy(){ energy++; }
-    public static void displayEnergy(){ energyLabel.setText("Typing Energy: " + energy); }
+    public static void displayEnergy(){ System.out.println("Energy to display: " + energy); energyLabel.setText("Typing Energy: " + energy); }
 
     public static boolean isGameTrue(){ return play; }
     public static void flipPlayOn(){ play = !play; }
@@ -138,21 +138,18 @@ public class MenuScreen extends JPanel implements KeyListener{
     public void keyPressed(KeyEvent e) {
         int keyClicked = e.getKeyCode();
         if(energy > 0){
-            switch(keyClicked){
-                case KeyEvent.VK_BACK_SPACE:
+                if(keyClicked == KeyEvent.VK_BACK_SPACE){
                     if(!wordTyped.isEmpty()){
                         wordTyped = wordTyped.substring(0, wordTyped.length()-1);
                     }
-                    subtractEnergy();
-                    break;
-                default:
+                    energy--;
+                }else{
                     wordTyped += e.getKeyChar();
-                    subtractEnergy();
-                    break;
-            }
+                    energy--;
+                }
 
             if(wordTyped.isEmpty()){
-                currentWordTypingLabel.setText("");
+                currentWordTypingLabel.setText("...");
             }else{
                 changeLetterColor(wordTyped);
             }
@@ -163,7 +160,7 @@ public class MenuScreen extends JPanel implements KeyListener{
                 }
 
                 wordTyped = "";
-                currentWordTypingLabel.setText("");
+                currentWordTypingLabel.setText("...");
                 getWord();
                 wordToType.setText(randomWord);
             }
@@ -222,7 +219,7 @@ public class MenuScreen extends JPanel implements KeyListener{
     public void changeLetterColor(String wordTyped){
         boolean lastLetterCorrect = true;
 
-        for(int i = 0; i < wordTyped.length(); i++){
+        for(int i = 0; i < Math.min(wordTyped.length(), randomWord.length()); i++){
             if(wordTyped.charAt(i) != randomWord.charAt(i)){
                 currentWordTypingLabel.setForeground(Color.RED);
                 lastLetterCorrect = false;
