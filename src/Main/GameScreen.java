@@ -38,18 +38,22 @@ public class GameScreen extends JPanel{
     private long currentTime;
     private long lastUpdateTimeEnergy;
     private long currentTimeEnergy;
-    private static int wave = 100;
-    private int userHP = 3;
+    private static int wave = 1;
+    private static int userHP = 3;
     private static int enemyCounter = 0;
     private long lastSpawnTime = 0;
     private static boolean allEnemiesMade = false;
+    private int hoveredTileX = -1;
+    private int hoveredTileY = -1;
     
         public GameScreen(BufferedImage img, MenuScreen menuScreen) {
             this.img = img;
     
             preloadBackground();
+            startTowerPlacingThread();
             startGameThread();
             setupMouseListener();
+            setupMouseMotionListener();
     
             setBounds(0,0, 832, 860);
             lastUpdateTime = System.nanoTime();
@@ -59,11 +63,9 @@ public class GameScreen extends JPanel{
         }
     
         public void startGameThread(){
-    
             Thread gameThread = new Thread(new Runnable() {
                 @Override
-                public void run() {
-                    System.out.println("Game thread started. Game state: " + MenuScreen.isGameTrue());
+                public void run() { 
                     fps = 0;
                     double spawnSpeed = 1.0 / wave;
                     double spawnInterval = 1000000000 * spawnSpeed ; // 1 second in nanoseconds
@@ -81,7 +83,6 @@ public class GameScreen extends JPanel{
 
                         //real stuff
                         updateEnemies();
-                        repaint();
 
                         //saves cpu usage
                         long frameTime = System.nanoTime();
@@ -96,6 +97,38 @@ public class GameScreen extends JPanel{
             }, "gameThread");
             gameThread.start();
         }
+
+        public void startTowerPlacingThread(){
+            Thread towerPlacingThread = new Thread(new Runnable() {
+                @Override
+                public void run() { 
+                    while(true){
+                        //displays fps in console
+                        if (fps == 30) {
+                            System.out.println("FPS: " + fps);
+                            fps = 0;
+                        } else {
+                            fps++;
+                        }
+
+                        //real stuff
+                        repaint();
+
+                        //saves cpu usage
+                        long frameTime = System.nanoTime();
+                        try {
+                            long sleepTime = Math.max(0, 33 - (System.nanoTime() - frameTime) / 1_000_000);
+                            Thread.sleep(sleepTime);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }, "towerPlacingThread");
+            towerPlacingThread.start();
+        }
+
+
     
         private void setupMouseListener() {
             addMouseListener(new MouseAdapter() {
@@ -129,20 +162,47 @@ public class GameScreen extends JPanel{
                 }
             });
         }
-    
+
+        private void setupMouseMotionListener() {
+            addMouseMotionListener(new MouseAdapter() {
+                @Override
+                public void mouseMoved(MouseEvent e) {
+                    int x = e.getX() / 64;
+                    int y = e.getY() / 64;
+
+                    if (x >= 0 && x < size && y >= 0 && y < size) {
+                        hoveredTileX = x;
+                        hoveredTileY = y;
+                        repaint(); // Repaint to update visual changes if necessary
+                    } else {
+                        hoveredTileX = -1;
+                        hoveredTileY = -1; // Mouse is outside the grid
+                    }
+                }
+            });
+        }
              
         @Override
         public void paintComponent(Graphics g){
-            double angleToEnemy = 0;
             super.paintComponent(g);
-    
+            double angleToEnemy = 0;
+            float transparency = 0.5f;
+            Graphics2D hover = (Graphics2D) g;
+            
+            if(MenuScreen.isEnergyTowerOn() || MenuScreen.isTowerAttackOn()){
+                System.out.println("works");
+                hover.setColor(Color.BLACK);
+                hover.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, transparency));
+                hover.fillRect(hoveredTileX * 64, hoveredTileY * 64, 64, 64);
+            }
+
             for(int y = 0; y < size; y++){
                 for(int x = 0; x < size; x++){
                     g.drawImage(backGroundImages[y][x], x*64, y*64, null);
                 }
             }
     
-            for (Enemy enemy : enemies) {
+            for (Enemy enemy : new ArrayList<>(enemies)) {
                 enemy.draw(g);
             }
     
@@ -196,18 +256,18 @@ public class GameScreen extends JPanel{
         }
 
         public void makeEnemies(double spawnInterval){
-                long currentSpawnTime = System.nanoTime();
-                int amountOfEnemies = 10 * wave;
-                if (currentSpawnTime - lastSpawnTime >= spawnInterval) {
-                    if(enemyCounter < amountOfEnemies){
-                        enemies.add(new Enemy(0, 64, img.getSubimage(20 * 64, 6 * 64, 64, 64)));
-                        lastSpawnTime = currentSpawnTime;
-                        enemyCounter++;
-                    }
+            long currentSpawnTime = System.nanoTime();
+            int amountOfEnemies = 10 * wave;
+            if (currentSpawnTime - lastSpawnTime >= spawnInterval) {
+                if(enemyCounter < amountOfEnemies){
+                    enemies.add(new Enemy(0, 64, img.getSubimage(20 * 64, 6 * 64, 64, 64)));
+                    lastSpawnTime = currentSpawnTime;
+                    enemyCounter++;
                 }
-                if(enemyCounter == (amountOfEnemies - 1)){
-                    allEnemiesMade = true;
-                }
+            }
+            if(enemyCounter == (amountOfEnemies - 1)){
+                allEnemiesMade = true;
+            }
         }
     
         private void updateEnemies() {
@@ -232,8 +292,8 @@ public class GameScreen extends JPanel{
                 Enemy firstEnemy = enemies.get(0);
                 if (firstEnemy.takeDamage(damage)) {
                     enemies.remove(firstEnemy); // Remove if health is 0
-                    checkWaveComplete();
                     System.out.println("Enemy with text!");
+                    checkWaveComplete();
                 }
             }
         }
@@ -274,7 +334,6 @@ public class GameScreen extends JPanel{
     public int getWave(){ return wave; }
 }
 /*
- * make enemies increase with waves
  * add a boss every 10 waves
  * add a win condition: survive 50 waves
  * display userHP

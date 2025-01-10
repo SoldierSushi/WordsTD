@@ -20,10 +20,12 @@ public class EnergyTower {
 
     public void harvestEnergy(float deltaTimeEnergy){
         timeSinceLastEnergy += deltaTimeEnergy;
-        if(timeSinceLastEnergy >= energyRate){
-            MenuScreen.addEnergy();
-            MenuScreen.displayEnergy();
-            timeSinceLastEnergy = 0;
+        if(MenuScreen.isGameTrue()){
+            if(timeSinceLastEnergy >= energyRate){
+                MenuScreen.addEnergy();
+                MenuScreen.displayEnergy();
+                timeSinceLastEnergy = 0;
+            }
         }
     }
 

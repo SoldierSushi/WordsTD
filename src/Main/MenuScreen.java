@@ -122,11 +122,21 @@ public class MenuScreen extends JPanel implements KeyListener{
 
     //used in gamescreen for towerAttack
     public static boolean isTowerAttackOn(){return towerAttackOn;}
-    public static void flipTowerAttackValue(){towerAttackOn = !towerAttackOn;}
+    public static void flipTowerAttackValue(){ 
+        if(EnergyTowerOn){
+            EnergyTowerOn = !EnergyTowerOn;
+        }
+        towerAttackOn = !towerAttackOn;
+    }
 
     //used in gamescreen for EnergyTower
     public static boolean isEnergyTowerOn(){return EnergyTowerOn;}
-    public static void flipEnergyTowerValue(){EnergyTowerOn = !EnergyTowerOn;}
+    public static void flipEnergyTowerValue(){ 
+        if(towerAttackOn){
+            towerAttackOn = !towerAttackOn;
+        }
+        EnergyTowerOn = !EnergyTowerOn; 
+    }
 
     public static void addEnergy(){ energy++; }
     public static void displayEnergy(){ System.out.println("Energy to display: " + energy); energyLabel.setText("Typing Energy: " + energy); }
