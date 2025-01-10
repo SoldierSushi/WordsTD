@@ -127,8 +127,6 @@ public class GameScreen extends JPanel{
             }, "towerPlacingThread");
             towerPlacingThread.start();
         }
-
-
     
         private void setupMouseListener() {
             addMouseListener(new MouseAdapter() {
@@ -325,11 +323,14 @@ public class GameScreen extends JPanel{
 
     public void userLoseHP(){
         userHP--;
+        MenuScreen.displayHealth();
         if(userHP <= 0){
             JOptionPane.showMessageDialog(null, "You lost, better luck next time!", "You Lose", JOptionPane.INFORMATION_MESSAGE);
             System.exit(0);
         }
     }
+
+    public static int getUserHP(){ return userHP; }
 
     public int getWave(){ return wave; }
 }
@@ -340,5 +341,4 @@ public class GameScreen extends JPanel{
  * add tower upgrades (range, atk speed, damage)
  * add different types of towers
  * display waves to user
- * make it so that user can place towers outside of the game loop
  */

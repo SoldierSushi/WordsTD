@@ -22,6 +22,7 @@ public class MenuScreen extends JPanel implements KeyListener{
     private static JLabel energyLabel;
     private JLabel currentWordTypingLabel;
     private JLabel shopTitleLabel;
+    private static JLabel userHPLabel;
     private JButton towerAttackButton;
     private JButton EnergyTowerButton;
     private static JButton PlayButton;
@@ -33,20 +34,17 @@ public class MenuScreen extends JPanel implements KeyListener{
     private static boolean play = false;
 
     public MenuScreen(){
-        //panel stuff
-        setLayout(null); // Stack components vertically
+        setLayout(null);
         setBounds(832, 0, 200, 860);
         addKeyListener(this);
         setFocusable(true);
         requestFocusInWindow();
 
-        //titleLabel stuff
         titleLabel = new JLabel("MENU", SwingConstants.CENTER);
         titleLabel.setBounds(0, 0, 200, 50);
         titleLabel.setForeground(Color.BLACK); // Set text color
         titleLabel.setFont(new Font("Georgia", Font.BOLD, 32));
 
-        //wordToType stuff
         getWord();
         wordToType = new JLabel(randomWord, SwingConstants.CENTER);
         wordToType.setBounds(0, 150,200, 25);
@@ -58,7 +56,6 @@ public class MenuScreen extends JPanel implements KeyListener{
         wordToTypeTitle.setForeground(Color.BLACK);
         wordToTypeTitle.setFont(new Font("Georgia", Font.BOLD, 24));
 
-        //energy label
         energyLabel = new JLabel();
         energyLabel.setHorizontalAlignment(SwingConstants.CENTER);
         energyLabel.setBounds(0, 125, 200, 25);
@@ -66,7 +63,6 @@ public class MenuScreen extends JPanel implements KeyListener{
         energyLabel.setFont(new Font("Georgia", Font.BOLD, 16));
         displayEnergy();
 
-        //CurrentWordTypingLabel
         currentWordTypingLabel = new JLabel("...", SwingConstants.CENTER);
         currentWordTypingLabel.setBounds(0, 175, 200, 25);
         currentWordTypingLabel.setFont(new Font("Georgia", Font.BOLD, 16));
@@ -75,6 +71,13 @@ public class MenuScreen extends JPanel implements KeyListener{
         shopTitleLabel.setBounds(0, 400, 200, 25);
         shopTitleLabel.setForeground(Color.BLACK);
         shopTitleLabel.setFont(new Font("Georgia", Font.BOLD, 24));
+
+        userHPLabel = new JLabel();
+        userHPLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        userHPLabel.setBounds(0, 700, 200, 25);
+        userHPLabel.setForeground(Color.BLACK);
+        userHPLabel.setFont(new Font("Georgia", Font.BOLD, 16));
+        displayHealth();
 
         //towerAttackButton
         towerAttackButton = new JButton("Tower Attack ($10)");
@@ -118,6 +121,7 @@ public class MenuScreen extends JPanel implements KeyListener{
         add(currentWordTypingLabel);
         add(PlayButton);
         add(shopTitleLabel);
+        add(userHPLabel);
     }
 
     //used in gamescreen for towerAttack
@@ -139,7 +143,9 @@ public class MenuScreen extends JPanel implements KeyListener{
     }
 
     public static void addEnergy(){ energy++; }
-    public static void displayEnergy(){ System.out.println("Energy to display: " + energy); energyLabel.setText("Typing Energy: " + energy); }
+    public static void displayEnergy(){ energyLabel.setText("Typing Energy: " + energy); }
+    public static void displayHealth(){ userHPLabel.setText("Health: " + GameScreen.getUserHP()); }
+
 
     public static boolean isGameTrue(){ return play; }
     public static void flipPlayOn(){ play = !play; }
