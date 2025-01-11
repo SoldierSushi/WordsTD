@@ -23,6 +23,7 @@ public class MenuScreen extends JPanel implements KeyListener{
     private JLabel currentWordTypingLabel;
     private JLabel shopTitleLabel;
     private static JLabel userHPLabel;
+    private static JLabel waveLabel;
     private JButton towerAttackButton;
     private JButton EnergyTowerButton;
     private static JButton PlayButton;
@@ -79,6 +80,13 @@ public class MenuScreen extends JPanel implements KeyListener{
         userHPLabel.setFont(new Font("Georgia", Font.BOLD, 16));
         displayHealth();
 
+        waveLabel = new JLabel();
+        waveLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        waveLabel.setBounds(0, 675, 200, 25);
+        waveLabel.setForeground(Color.BLACK);
+        waveLabel.setFont(new Font("Georgia", Font.BOLD, 16));
+        displayWave();
+
         //towerAttackButton
         towerAttackButton = new JButton("Tower Attack ($10)");
         towerAttackButton.setBounds(0, 425, 200, 50);
@@ -122,6 +130,7 @@ public class MenuScreen extends JPanel implements KeyListener{
         add(PlayButton);
         add(shopTitleLabel);
         add(userHPLabel);
+        add(waveLabel);
     }
 
     //used in gamescreen for towerAttack
@@ -145,6 +154,8 @@ public class MenuScreen extends JPanel implements KeyListener{
     public static void addEnergy(){ energy++; }
     public static void displayEnergy(){ energyLabel.setText("Typing Energy: " + energy); }
     public static void displayHealth(){ userHPLabel.setText("Health: " + GameScreen.getUserHP()); }
+
+    public static void displayWave(){ waveLabel.setText("Wave: " + GameScreen.getWave());}
 
 
     public static boolean isGameTrue(){ return play; }

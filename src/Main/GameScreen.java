@@ -38,7 +38,7 @@ public class GameScreen extends JPanel{
     private long currentTime;
     private long lastUpdateTimeEnergy;
     private long currentTimeEnergy;
-    private static int wave = 1;
+    private static int wave = 50;
     private static int userHP = 3;
     private static int enemyCounter = 0;
     private long lastSpawnTime = 0;
@@ -311,15 +311,25 @@ public class GameScreen extends JPanel{
     
         public static void checkWaveComplete(){
             if(enemies.isEmpty() && allEnemiesMade){
-                System.out.println("wave " + wave + " complete");
-                wave++;
+                if(wave == 50){
+                    Object[] options = {"Yes", "No"};
+                    int gameContinue = JOptionPane.showOptionDialog(null, "You win! Would you like to play infinite mode?", "You Win",JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,null,options, options[0]);
+                    
+                    if(gameContinue == 1) {
+                        JOptionPane.showMessageDialog(null, "Thank you for playing WORDS TD :)", "WORDS TD", JOptionPane.INFORMATION_MESSAGE);
+                        System.exit(0);
+                    }
+                }else{
+                    wave++;
+                }
+                MenuScreen.displayWave();
                 enemies.clear();
                 MenuScreen.flipPlayOn();
                 MenuScreen.resetPlayButton();
                 enemyCounter = 0;
                 allEnemiesMade = false;
+            }
         }
-    }
 
     public void userLoseHP(){
         userHP--;
@@ -332,13 +342,13 @@ public class GameScreen extends JPanel{
 
     public static int getUserHP(){ return userHP; }
 
-    public int getWave(){ return wave; }
+    public static int getWave(){ return wave; }
 }
+
 /*
  * add a boss every 10 waves
  * add a win condition: survive 50 waves
- * display userHP
- * add tower upgrades (range, atk speed, damage)
+ * add tower upgrades (range, atk speed, damage) for each tower when clicked
  * add different types of towers
  * display waves to user
  */
