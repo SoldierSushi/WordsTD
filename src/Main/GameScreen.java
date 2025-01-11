@@ -1,7 +1,10 @@
 package Main;
 
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+
 import java.awt.event.MouseEvent;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -38,7 +41,7 @@ public class GameScreen extends JPanel{
     private long currentTime;
     private long lastUpdateTimeEnergy;
     private long currentTimeEnergy;
-    private static int wave = 50;
+    private static int wave = 1;
     private static int userHP = 3;
     private static int enemyCounter = 0;
     private long lastSpawnTime = 0;
@@ -133,10 +136,9 @@ public class GameScreen extends JPanel{
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     System.out.println("mouse clicked");
+                    int x = e.getX() / 64;
+                    int y = e.getY() / 64;
                     if(MenuScreen.isTowerAttackOn()){
-                        int x = e.getX() / 64;
-                        int y = e.getY() / 64;
-    
                         if (x >= 0 && x < size && y >= 0 && y < size) {
                             if (map[y][x] == 0) { // Only place a tower on empty tiles
                                 map[y][x] = 2; // Mark the tile as occupied
@@ -144,11 +146,16 @@ public class GameScreen extends JPanel{
                             }
                         }
                         MenuScreen.flipTowerAttackValue();
-    
+
+                    }else if(map[y][x] == 2){
+                        for (Tower tower : towers) {
+                            if (tower.getX() / 64 == x && tower.getY() / 64 == y) {
+                                showTowerMenu(x * 64, y * 64, tower);
+                                return;
+                            }
+                        }
+
                     }else if(MenuScreen.isEnergyTowerOn()){
-                        int x = e.getX() / 64;
-                        int y = e.getY() / 64;
-    
                         if (x >= 0 && x < size && y >= 0 && y < size) {
                             if (map[y][x] == 0) {
                                 map[y][x] = 3;
@@ -343,12 +350,48 @@ public class GameScreen extends JPanel{
     public static int getUserHP(){ return userHP; }
 
     public static int getWave(){ return wave; }
+
+    private void showTowerMenu(int x, int y, Tower tower) {
+        JPopupMenu menu = new JPopupMenu();
+
+        JMenuItem upgradeOption = new JMenuItem("Upgrade Tower");
+        upgradeOption.addActionListener(e -> showUpgradeMenu(x, y, tower));
+
+        JMenuItem sellOption = new JMenuItem("Sell Tower");
+        sellOption.addActionListener(e -> sellTower(x, y, tower));
+        System.out.println("Tower removed");
+
+        menu.add(upgradeOption);
+        menu.add(sellOption);
+
+        menu.show(this, x + 32, y + 32); // Adjusted to display below the tower
+    }
+
+    private void showUpgradeMenu(int x, int y, Tower tower){
+        JPopupMenu upgradeMenu = new JPopupMenu();
+
+        JMenuItem damageOption =  new JMenuItem("Upgrade damage");
+
+        JMenuItem fireRateOption =  new JMenuItem("Upgrade atk speed");
+
+        JMenuItem rangeOption =  new JMenuItem("Upgrade range");
+
+        upgradeMenu.add(damageOption);
+        upgradeMenu.add(fireRateOption);
+        upgradeMenu.add(rangeOption);
+
+        upgradeMenu.show(this, x + 64, y + 32);
+
+    }
+
+    public void sellTower(int x, int y, Tower tower){
+        map[y/64][x/64] = 0;
+        towers.remove(tower);
+    }
 }
 
 /*
  * add a boss every 10 waves
- * add a win condition: survive 50 waves
  * add tower upgrades (range, atk speed, damage) for each tower when clicked
  * add different types of towers
- * display waves to user
  */
