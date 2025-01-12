@@ -11,6 +11,7 @@ public class Tower {
     private int towerX;
     private double fireRate;
     private float timeSinceLastShot;
+    private int range;
 
     public Tower(int towerX, int towerY, BufferedImage image, double fireRate) {
         this.towerX = towerX;
@@ -18,6 +19,7 @@ public class Tower {
         this.image = image;
         this.fireRate = fireRate;
         this.timeSinceLastShot = 0;
+        this.range = 160;
     }
 
     public Enemy nearestEnemy(List<Enemy> enemies) {
@@ -27,7 +29,7 @@ public class Tower {
         for (Enemy enemy : enemies) {
             double distance = Math.sqrt(Math.pow((enemy.getY() + 32) - (towerY * 64 + 32), 2) + Math.pow((enemy.getX() + 32) - (towerX * 64 + 32), 2));
             if (distance < minDistance) {
-                if(distance <= 160){
+                if(distance <= range){
                     minDistance = distance;
                     nearest = enemy;
                 }
@@ -66,6 +68,7 @@ public class Tower {
     public Projectile shoot(int speed, double angle, float deltaTime){
         timeSinceLastShot += deltaTime;
         if (timeSinceLastShot >= fireRate) {
+            System.out.println("shot with fire rate of: " + fireRate);
             double angleInRadians = Math.toRadians(angle);
             double velocityX = speed * Math.cos(angleInRadians);
             double velocityY = speed * Math.sin(angleInRadians);
@@ -74,6 +77,14 @@ public class Tower {
             return new Projectile(towerX * 64 + 32, towerY * 64 + 32, velocityX, velocityY);
         }
         return null;
+    }
+
+    public void setFireRate(double fireRate) {
+        this.fireRate = fireRate;
+    }
+
+    public void setRange(int range) {
+        this.range = range;
     }
 
     public void draw(Graphics g, double angleToEnemy) {

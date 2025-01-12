@@ -48,6 +48,8 @@ public class GameScreen extends JPanel{
     private static boolean allEnemiesMade = false;
     private int hoveredTileX = -1;
     private int hoveredTileY = -1;
+    private double fireRate = 1;
+    private double amountOfEnemies = 0;
     
         public GameScreen(BufferedImage img, MenuScreen menuScreen) {
             this.img = img;
@@ -70,8 +72,11 @@ public class GameScreen extends JPanel{
                 @Override
                 public void run() { 
                     fps = 0;
-                    double spawnSpeed = 1.0 / wave;
-                    double spawnInterval = 1000000000 * spawnSpeed ; // 1 second in nanoseconds
+                    double spawnSpeed = 1.6 * Math.pow(0.95, wave);
+                    amountOfEnemies += 5 * Math.pow(1.2, wave);
+                    System.out.println("Spawn Speed: " + spawnSpeed);
+                    System.out.println("Enemies to spawn: " + amountOfEnemies);
+                    float spawnInterval = 1000000000 * (float) spawnSpeed ; // 1 second in nanoseconds
                     lastSpawnTime = System.nanoTime();
                     while(MenuScreen.isGameTrue()){
                         makeEnemies(spawnInterval);
@@ -142,7 +147,7 @@ public class GameScreen extends JPanel{
                         if (x >= 0 && x < size && y >= 0 && y < size) {
                             if (map[y][x] == 0) { // Only place a tower on empty tiles
                                 map[y][x] = 2; // Mark the tile as occupied
-                                towers.add(new Tower(x, y, img.getSubimage(19 * 64, 10 * 64, 64, 64), 0.2));
+                                towers.add(new Tower(x, y, img.getSubimage(19 * 64, 10 * 64, 64, 64), fireRate));
                             }
                         }
                         MenuScreen.flipTowerAttackValue();
@@ -195,7 +200,6 @@ public class GameScreen extends JPanel{
             Graphics2D hover = (Graphics2D) g;
             
             if(MenuScreen.isEnergyTowerOn() || MenuScreen.isTowerAttackOn()){
-                System.out.println("works");
                 hover.setColor(Color.BLACK);
                 hover.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, transparency));
                 hover.fillRect(hoveredTileX * 64, hoveredTileY * 64, 64, 64);
@@ -262,7 +266,6 @@ public class GameScreen extends JPanel{
 
         public void makeEnemies(double spawnInterval){
             long currentSpawnTime = System.nanoTime();
-            int amountOfEnemies = 10 * wave;
             if (currentSpawnTime - lastSpawnTime >= spawnInterval) {
                 if(enemyCounter < amountOfEnemies){
                     enemies.add(new Enemy(0, 64, img.getSubimage(20 * 64, 6 * 64, 64, 64)));
@@ -270,7 +273,7 @@ public class GameScreen extends JPanel{
                     enemyCounter++;
                 }
             }
-            if(enemyCounter == (amountOfEnemies - 1)){
+            if(enemyCounter == (amountOfEnemies)){
                 allEnemiesMade = true;
             }
         }
@@ -322,7 +325,9 @@ public class GameScreen extends JPanel{
                     Object[] options = {"Yes", "No"};
                     int gameContinue = JOptionPane.showOptionDialog(null, "You win! Would you like to play infinite mode?", "You Win",JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,null,options, options[0]);
                     
-                    if(gameContinue == 1) {
+                    if(gameContinue == 0){
+                        wave++;
+                    }else if(gameContinue == 1) {
                         JOptionPane.showMessageDialog(null, "Thank you for playing WORDS TD :)", "WORDS TD", JOptionPane.INFORMATION_MESSAGE);
                         System.exit(0);
                     }
@@ -370,13 +375,12 @@ public class GameScreen extends JPanel{
     private void showUpgradeMenu(int x, int y, Tower tower){
         JPopupMenu upgradeMenu = new JPopupMenu();
 
-        JMenuItem damageOption =  new JMenuItem("Upgrade damage");
-
         JMenuItem fireRateOption =  new JMenuItem("Upgrade atk speed");
+        fireRateOption.addActionListener(e -> lowerFireRate());
 
         JMenuItem rangeOption =  new JMenuItem("Upgrade range");
+        rangeOption.addActionListener(e -> lowerFireRate());
 
-        upgradeMenu.add(damageOption);
         upgradeMenu.add(fireRateOption);
         upgradeMenu.add(rangeOption);
 
@@ -387,6 +391,14 @@ public class GameScreen extends JPanel{
     public void sellTower(int x, int y, Tower tower){
         map[y/64][x/64] = 0;
         towers.remove(tower);
+    }
+
+    public void lowerFireRate() {
+        for (Tower tower : towers) {
+            double newFireRate = fireRate - 0.1;
+            tower.setFireRate(newFireRate);
+            fireRate = newFireRate;
+        }
     }
 }
 
