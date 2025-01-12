@@ -50,6 +50,7 @@ public class GameScreen extends JPanel{
     private int hoveredTileY = -1;
     private double fireRate = 1;
     private double amountOfEnemies = 0;
+    private int range = 160;
     
         public GameScreen(BufferedImage img, MenuScreen menuScreen) {
             this.img = img;
@@ -147,7 +148,7 @@ public class GameScreen extends JPanel{
                         if (x >= 0 && x < size && y >= 0 && y < size) {
                             if (map[y][x] == 0) { // Only place a tower on empty tiles
                                 map[y][x] = 2; // Mark the tile as occupied
-                                towers.add(new Tower(x, y, img.getSubimage(19 * 64, 10 * 64, 64, 64), fireRate));
+                                towers.add(new Tower(x, y, img.getSubimage(19 * 64, 10 * 64, 64, 64), fireRate, range));
                             }
                         }
                         MenuScreen.flipTowerAttackValue();
@@ -379,7 +380,7 @@ public class GameScreen extends JPanel{
         fireRateOption.addActionListener(e -> lowerFireRate());
 
         JMenuItem rangeOption =  new JMenuItem("Upgrade range");
-        rangeOption.addActionListener(e -> lowerFireRate());
+        rangeOption.addActionListener(e -> increaseRange());
 
         upgradeMenu.add(fireRateOption);
         upgradeMenu.add(rangeOption);
@@ -398,6 +399,14 @@ public class GameScreen extends JPanel{
             double newFireRate = fireRate - 0.1;
             tower.setFireRate(newFireRate);
             fireRate = newFireRate;
+        }
+    }
+
+    public void increaseRange() {
+        for (Tower tower : towers) {
+            int newRange = range + 40;
+            tower.setRange(newRange);
+            range = newRange;
         }
     }
 }

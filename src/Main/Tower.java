@@ -13,13 +13,13 @@ public class Tower {
     private float timeSinceLastShot;
     private int range;
 
-    public Tower(int towerX, int towerY, BufferedImage image, double fireRate) {
+    public Tower(int towerX, int towerY, BufferedImage image, double fireRate, int range) {
         this.towerX = towerX;
         this.towerY = towerY;
         this.image = image;
         this.fireRate = fireRate;
         this.timeSinceLastShot = 0;
-        this.range = 160;
+        this.range = range;
     }
 
     public Enemy nearestEnemy(List<Enemy> enemies) {
@@ -30,6 +30,7 @@ public class Tower {
             double distance = Math.sqrt(Math.pow((enemy.getY() + 32) - (towerY * 64 + 32), 2) + Math.pow((enemy.getX() + 32) - (towerX * 64 + 32), 2));
             if (distance < minDistance) {
                 if(distance <= range){
+                    System.out.println("Tower range is: " + range);
                     minDistance = distance;
                     nearest = enemy;
                 }
