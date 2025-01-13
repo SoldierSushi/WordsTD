@@ -25,8 +25,8 @@ public class MenuScreen extends JPanel implements KeyListener{
     private static JLabel userHPLabel;
     private static JLabel waveLabel;
     private static JLabel moneyLabel;
-    private JButton towerAttackButton;
-    private JButton EnergyTowerButton;
+    private static JButton towerAttackButton;
+    private static JButton EnergyTowerButton;
     private static JButton PlayButton;
     private static boolean towerAttackOn = false;
     private static boolean EnergyTowerOn = false;
@@ -96,22 +96,24 @@ public class MenuScreen extends JPanel implements KeyListener{
         displayMoney();
 
         //towerAttackButton
-        towerAttackButton = new JButton("Tower Attack ($10)");
+        towerAttackButton = new JButton();
         towerAttackButton.setBounds(0, 425, 200, 50);
         towerAttackButton.setForeground(Color.BLACK);
         towerAttackButton.setFont(new Font("Georgia", Font.BOLD, 16));
         towerAttackButton.setFocusable(false);
+        displayTowerCost();
         towerAttackButton.addActionListener(e -> {
             if(GameScreen.getMoney() >= GameScreen.getTowerCost() || isTowerAttackOn()){
                 flipTowerAttackValue();
             }
         });
 
-        EnergyTowerButton = new JButton("Energy Tower ($100)");
+        EnergyTowerButton = new JButton();
         EnergyTowerButton.setBounds(0, 475, 200, 50);
         EnergyTowerButton.setForeground(Color.BLACK);
         EnergyTowerButton.setFont(new Font("Georgia", Font.BOLD, 16));
         EnergyTowerButton.setFocusable(false);
+        displayEnergyTowerCost();
         EnergyTowerButton.addActionListener(e -> {
             if(GameScreen.getMoney() >= GameScreen.getEnergyTowerCost() || isEnergyTowerOn()){
                 flipEnergyTowerValue();
@@ -169,6 +171,8 @@ public class MenuScreen extends JPanel implements KeyListener{
     public static void displayHealth(){ userHPLabel.setText("Health: " + GameScreen.getUserHP()); }
     public static void displayWave(){ waveLabel.setText("Wave: " + GameScreen.getWave());}
     public static void displayMoney(){ moneyLabel.setText("Money: " + GameScreen.getMoney()); }
+    public static void displayTowerCost(){ towerAttackButton.setText("Attack Tower : " + GameScreen.getTowerCost()); }
+    public static void displayEnergyTowerCost(){ EnergyTowerButton.setText("Energy Tower : " + GameScreen.getEnergyTowerCost()); }
 
 
     public static boolean isGameTrue(){ return play; }

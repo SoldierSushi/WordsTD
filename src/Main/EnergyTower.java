@@ -29,6 +29,9 @@ public class EnergyTower {
         }
     }
 
+    public int getX() { return towerX*64; }
+    public int getY() { return towerY*64; }
+
     public void draw(Graphics g) {
         int towerScreenX = towerX * 64;
         int towerScreenY = towerY * 64;

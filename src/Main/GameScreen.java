@@ -41,7 +41,7 @@ public class GameScreen extends JPanel{
     private long currentTime;
     private long lastUpdateTimeEnergy;
     private long currentTimeEnergy;
-    private static int wave = 15;
+    private static int wave = 1;
     private static int userHP = 3;
     private static int enemyCounter = 0;
     private long lastSpawnTime = 0;
@@ -157,13 +157,20 @@ public class GameScreen extends JPanel{
                             }
                         }
                         MenuScreen.flipTowerAttackValue();
-                        useMoney(getTowerCost());
+                        useMoneyForAttackTower(getTowerCost());
                         MenuScreen.displayMoney();
 
                     }else if(map[y][x] == 2){
                         for (Tower tower : towers) {
                             if (tower.getX() / 64 == x && tower.getY() / 64 == y) {
                                 showTowerMenu(x * 64, y * 64, tower);
+                                return;
+                            }
+                        }
+                    }else if(map[y][x] == 3){
+                        for (EnergyTower energyTower : energyTowers) {
+                            if (energyTower.getX() / 64 == x && energyTower.getY() / 64 == y) {
+                                showEnergyTowerMenu(x * 64, y * 64, energyTower);
                                 return;
                             }
                         }
@@ -176,7 +183,7 @@ public class GameScreen extends JPanel{
                             }
                         }
                         MenuScreen.flipEnergyTowerValue();
-                        useMoney(getEnergyTowerCost());
+                        useMoneyForEnergyTower(getEnergyTowerCost());
                         MenuScreen.displayMoney();
                     }
                 }
@@ -384,7 +391,6 @@ public class GameScreen extends JPanel{
     }
 
     public static int getUserHP(){ return userHP; }
-
     public static int getWave(){ return wave; }
 
     private void showTowerMenu(int x, int y, Tower tower) {
@@ -415,14 +421,35 @@ public class GameScreen extends JPanel{
         upgradeMenu.add(rangeOption);
 
         upgradeMenu.show(this, x + 64, y + 32);
-
     }
 
     public void sellTower(int x, int y, Tower tower){
         map[y/64][x/64] = 0;
         towers.remove(tower);
-        money += towerCost;
+        money += towerCost - 5;
+        towerCost -=5;
         MenuScreen.displayMoney();
+        MenuScreen.displayTowerCost();
+    }
+
+    private void showEnergyTowerMenu(int x, int y, EnergyTower energyTower) {
+        JPopupMenu menu = new JPopupMenu();
+
+        JMenuItem sellOption = new JMenuItem("Sell Tower");
+        sellOption.addActionListener(e -> sellEnergyTower(x, y, energyTower));
+
+        menu.add(sellOption);
+
+        menu.show(this, x + 32, y + 32); // Adjusted to display below the tower
+    }
+
+    public void sellEnergyTower(int x, int y, EnergyTower energyTower){
+        map[y/64][x/64] = 0;
+        energyTowers.remove(energyTower);
+        money += energyTowerCost - 10;
+        energyTowerCost -=10;
+        MenuScreen.displayMoney();
+        MenuScreen.displayEnergyTowerCost();
     }
 
     public void lowerFireRate(Tower tower) {
@@ -438,9 +465,17 @@ public class GameScreen extends JPanel{
     public static int getMoney(){ return money; }
     public static int getTowerCost(){ return towerCost; }
     public static int getEnergyTowerCost(){ return energyTowerCost; }
-    public void useMoney(int cost){ 
+    public void useMoneyForAttackTower(int cost){ 
         money -= cost; 
+        towerCost += 5;
         MenuScreen.displayMoney();
+        MenuScreen.displayTowerCost();
+    }
+    public void useMoneyForEnergyTower(int cost){ 
+        money -= cost; 
+        energyTowerCost += 10;
+        MenuScreen.displayMoney();
+        MenuScreen.displayEnergyTowerCost();
     }
 }
 
@@ -450,6 +485,5 @@ public class GameScreen extends JPanel{
  * determine if money is more than towerCost
  * place tower and take away cost from money
  * if money is lower than towerCost, display to the user that they do not have enough money
- * make sell and upgrade popup for energy towers
  * add different types of towers
  */
