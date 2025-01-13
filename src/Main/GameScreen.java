@@ -54,6 +54,7 @@ public class GameScreen extends JPanel{
     private static int money = 100;
     private static int towerCost = 20;
     private static int energyTowerCost = 100;
+    private Tower hoveredTower = null;
     
         public GameScreen(BufferedImage img, MenuScreen menuScreen) {
             this.img = img;
@@ -147,6 +148,7 @@ public class GameScreen extends JPanel{
                     System.out.println("mouse clicked");
                     int x = e.getX() / 64;
                     int y = e.getY() / 64;
+                    
                     if(MenuScreen.isTowerAttackOn()){
                         if (x >= 0 && x < size && y >= 0 && y < size) {
                             if (map[y][x] == 0) { // Only place a tower on empty tiles
@@ -196,6 +198,14 @@ public class GameScreen extends JPanel{
                         hoveredTileX = -1;
                         hoveredTileY = -1; // Mouse is outside the grid
                     }
+
+                    hoveredTower = null; // Reset hoveredTower
+                    for (Tower tower : towers) {
+                        if (new Rectangle(tower.getX(), tower.getY(), 64, 64).contains(x*64, y*64)) {
+                            hoveredTower = tower;
+                            break;
+                        }
+                    }
                 }
             });
         }
@@ -241,6 +251,16 @@ public class GameScreen extends JPanel{
                 
                 tower.draw(g, angleToEnemy);
             }
+
+            if (hoveredTower != null) {
+                int centerX = hoveredTower.getX() + 32;
+                int centerY = hoveredTower.getY() + 32;
+                int showrange = hoveredTower.getRange(); 
+                g.setColor(new Color(255, 0, 0, 64)); // Semi-transparent blue
+                g.fillOval(centerX - showrange, centerY - showrange, showrange * 2, showrange * 2);
+                g.drawOval(centerX - showrange, centerY - showrange, showrange * 2, showrange * 2);
+            }
+
             lastUpdateTime = currentTime;
     
             for(EnergyTower energyTower : energyTowers){

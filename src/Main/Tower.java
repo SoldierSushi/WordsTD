@@ -81,6 +81,7 @@ public class Tower {
         this.fireRate = fireRate;
     }
 
+    public int getRange(){ return range; }
     public void setRange(int rangeAdd) {
         this.range += rangeAdd;
     }
@@ -97,9 +98,5 @@ public class Tower {
         g2d.rotate(Math.toRadians(angleToEnemy + 90));
         g2d.drawImage(image, -32, -32, null);
         g2d.setTransform(originalTransform);
-        
-        g2d.setColor(new Color(255, 0, 0, 50)); // Semi-transparent red
-        g2d.fillOval(towerScreenX + 32 - range, towerScreenY + 32 - range, 2 * range, 2 * range);
-
     }
 }
