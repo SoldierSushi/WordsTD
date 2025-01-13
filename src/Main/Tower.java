@@ -1,5 +1,6 @@
 package Main;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -28,12 +29,9 @@ public class Tower {
 
         for (Enemy enemy : enemies) {
             double distance = Math.sqrt(Math.pow((enemy.getY() + 32) - (towerY * 64 + 32), 2) + Math.pow((enemy.getX() + 32) - (towerX * 64 + 32), 2));
-            if (distance < minDistance) {
-                if(distance <= range){
-                    System.out.println("Tower range is: " + range);
-                    minDistance = distance;
-                    nearest = enemy;
-                }
+            if (distance < minDistance && distance <= range) {
+                minDistance = distance;
+                nearest = enemy;
             }
         }
         return nearest;
@@ -69,7 +67,6 @@ public class Tower {
     public Projectile shoot(int speed, double angle, float deltaTime){
         timeSinceLastShot += deltaTime;
         if (timeSinceLastShot >= fireRate) {
-            System.out.println("shot with fire rate of: " + fireRate);
             double angleInRadians = Math.toRadians(angle);
             double velocityX = speed * Math.cos(angleInRadians);
             double velocityY = speed * Math.sin(angleInRadians);
@@ -84,8 +81,8 @@ public class Tower {
         this.fireRate = fireRate;
     }
 
-    public void setRange(int range) {
-        this.range = range;
+    public void setRange(int rangeAdd) {
+        this.range += rangeAdd;
     }
 
     public void draw(Graphics g, double angleToEnemy) {
@@ -95,13 +92,14 @@ public class Tower {
         int towerScreenY = towerY * 64;
     
         var originalTransform = g2d.getTransform();
-    
+        
         g2d.translate(towerScreenX + 32, towerScreenY + 32);
-    
         g2d.rotate(Math.toRadians(angleToEnemy + 90));
-    
         g2d.drawImage(image, -32, -32, null);
-    
         g2d.setTransform(originalTransform);
+        
+        g2d.setColor(new Color(255, 0, 0, 50)); // Semi-transparent red
+        g2d.fillOval(towerScreenX + 32 - range, towerScreenY + 32 - range, 2 * range, 2 * range);
+
     }
 }

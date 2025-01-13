@@ -51,7 +51,7 @@ public class GameScreen extends JPanel{
     private double fireRate = 1;
     private double amountOfEnemies = 0;
     private int range = 160;
-    private static int money = 20;
+    private static int money = 100;
     private static int towerCost = 20;
     private static int energyTowerCost = 100;
     
@@ -386,10 +386,10 @@ public class GameScreen extends JPanel{
         JPopupMenu upgradeMenu = new JPopupMenu();
 
         JMenuItem fireRateOption =  new JMenuItem("Upgrade atk speed");
-        fireRateOption.addActionListener(e -> lowerFireRate());
+        fireRateOption.addActionListener(e -> lowerFireRate(tower));
 
         JMenuItem rangeOption =  new JMenuItem("Upgrade range");
-        rangeOption.addActionListener(e -> increaseRange());
+        rangeOption.addActionListener(e -> increaseRange(tower));
 
         upgradeMenu.add(fireRateOption);
         upgradeMenu.add(rangeOption);
@@ -405,20 +405,14 @@ public class GameScreen extends JPanel{
         MenuScreen.displayMoney();
     }
 
-    public void lowerFireRate() {
-        for (Tower tower : towers) {
-            double newFireRate = fireRate - 0.1;
-            tower.setFireRate(newFireRate);
-            fireRate = newFireRate;
-        }
+    public void lowerFireRate(Tower tower) {
+        double newFireRate = fireRate - 0.1;
+        tower.setFireRate(newFireRate);
+        fireRate = newFireRate;
     }
 
-    public void increaseRange() {
-        for (Tower tower : towers) {
-            int newRange = range + 40;
-            tower.setRange(newRange);
-            range = newRange;
-        }
+    public void increaseRange(Tower tower) {
+        tower.setRange(40);
     }
 
     public static int getMoney(){ return money; }
@@ -432,11 +426,10 @@ public class GameScreen extends JPanel{
 
 /*
  * add a boss every 10 waves
- * add currency system
  * check if upgrade was clicked
  * determine if money is more than towerCost
  * place tower and take away cost from money
  * if money is lower than towerCost, display to the user that they do not have enough money
- * 
+ * make sell and upgrade popup for energy towers
  * add different types of towers
  */
