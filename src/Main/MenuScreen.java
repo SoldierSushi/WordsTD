@@ -24,6 +24,7 @@ public class MenuScreen extends JPanel implements KeyListener{
     private JLabel shopTitleLabel;
     private static JLabel userHPLabel;
     private static JLabel waveLabel;
+    private static JLabel moneyLabel;
     private JButton towerAttackButton;
     private JButton EnergyTowerButton;
     private static JButton PlayButton;
@@ -87,6 +88,13 @@ public class MenuScreen extends JPanel implements KeyListener{
         waveLabel.setFont(new Font("Georgia", Font.BOLD, 16));
         displayWave();
 
+        moneyLabel = new JLabel();
+        moneyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        moneyLabel.setBounds(0, 525, 200, 25);
+        moneyLabel.setForeground(Color.BLACK);
+        moneyLabel.setFont(new Font("Georgia", Font.BOLD, 16));
+        displayMoney();
+
         //towerAttackButton
         towerAttackButton = new JButton("Tower Attack ($10)");
         towerAttackButton.setBounds(0, 425, 200, 50);
@@ -94,7 +102,9 @@ public class MenuScreen extends JPanel implements KeyListener{
         towerAttackButton.setFont(new Font("Georgia", Font.BOLD, 16));
         towerAttackButton.setFocusable(false);
         towerAttackButton.addActionListener(e -> {
-            flipTowerAttackValue();
+            if(GameScreen.getMoney() >= GameScreen.getTowerCost() || isTowerAttackOn()){
+                flipTowerAttackValue();
+            }
         });
 
         EnergyTowerButton = new JButton("Energy Tower ($100)");
@@ -103,7 +113,9 @@ public class MenuScreen extends JPanel implements KeyListener{
         EnergyTowerButton.setFont(new Font("Georgia", Font.BOLD, 16));
         EnergyTowerButton.setFocusable(false);
         EnergyTowerButton.addActionListener(e -> {
-            flipEnergyTowerValue();
+            if(GameScreen.getMoney() >= GameScreen.getEnergyTowerCost() || isEnergyTowerOn()){
+                flipEnergyTowerValue();
+            }
         });
 
         PlayButton = new JButton("Play");
@@ -131,6 +143,7 @@ public class MenuScreen extends JPanel implements KeyListener{
         add(shopTitleLabel);
         add(userHPLabel);
         add(waveLabel);
+        add(moneyLabel);
     }
 
     //used in gamescreen for towerAttack
@@ -154,8 +167,8 @@ public class MenuScreen extends JPanel implements KeyListener{
     public static void addEnergy(){ energy++; }
     public static void displayEnergy(){ energyLabel.setText("Typing Energy: " + energy); }
     public static void displayHealth(){ userHPLabel.setText("Health: " + GameScreen.getUserHP()); }
-
     public static void displayWave(){ waveLabel.setText("Wave: " + GameScreen.getWave());}
+    public static void displayMoney(){ moneyLabel.setText("Money: " + GameScreen.getMoney()); }
 
 
     public static boolean isGameTrue(){ return play; }

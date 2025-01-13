@@ -41,7 +41,7 @@ public class GameScreen extends JPanel{
     private long currentTime;
     private long lastUpdateTimeEnergy;
     private long currentTimeEnergy;
-    private static int wave = 1;
+    private static int wave = 15;
     private static int userHP = 3;
     private static int enemyCounter = 0;
     private long lastSpawnTime = 0;
@@ -51,6 +51,9 @@ public class GameScreen extends JPanel{
     private double fireRate = 1;
     private double amountOfEnemies = 0;
     private int range = 160;
+    private static int money = 20;
+    private static int towerCost = 20;
+    private static int energyTowerCost = 100;
     
         public GameScreen(BufferedImage img, MenuScreen menuScreen) {
             this.img = img;
@@ -73,7 +76,7 @@ public class GameScreen extends JPanel{
                 @Override
                 public void run() { 
                     fps = 0;
-                    double spawnSpeed = 1.6 * Math.pow(0.95, wave);
+                    double spawnSpeed = 1.6 * Math.pow(0.9, wave);
                     amountOfEnemies += 5 * Math.pow(1.2, wave);
                     System.out.println("Spawn Speed: " + spawnSpeed);
                     System.out.println("Enemies to spawn: " + amountOfEnemies);
@@ -152,6 +155,8 @@ public class GameScreen extends JPanel{
                             }
                         }
                         MenuScreen.flipTowerAttackValue();
+                        useMoney(getTowerCost());
+                        MenuScreen.displayMoney();
 
                     }else if(map[y][x] == 2){
                         for (Tower tower : towers) {
@@ -169,6 +174,8 @@ public class GameScreen extends JPanel{
                             }
                         }
                         MenuScreen.flipEnergyTowerValue();
+                        useMoney(getEnergyTowerCost());
+                        MenuScreen.displayMoney();
                     }
                 }
             });
@@ -286,12 +293,14 @@ public class GameScreen extends JPanel{
                 Enemy enemy = iterator.next();
                 if(enemy.isEnemyDead()){
                     iterator.remove();
+                    money++;
                     System.out.println("Enemy killed");
                 }else if (enemy.update()) {
                     userLoseHP();
                     iterator.remove();
                     System.out.println("Enemy reached the end");
                 }
+                MenuScreen.displayMoney();
                 checkWaveComplete();
             }
         }
@@ -301,6 +310,7 @@ public class GameScreen extends JPanel{
                 Enemy firstEnemy = enemies.get(0);
                 if (firstEnemy.takeDamage(damage)) {
                     enemies.remove(firstEnemy); // Remove if health is 0
+                    money += 5;
                     System.out.println("Enemy with text!");
                     checkWaveComplete();
                 }
@@ -365,7 +375,6 @@ public class GameScreen extends JPanel{
 
         JMenuItem sellOption = new JMenuItem("Sell Tower");
         sellOption.addActionListener(e -> sellTower(x, y, tower));
-        System.out.println("Tower removed");
 
         menu.add(upgradeOption);
         menu.add(sellOption);
@@ -392,6 +401,8 @@ public class GameScreen extends JPanel{
     public void sellTower(int x, int y, Tower tower){
         map[y/64][x/64] = 0;
         towers.remove(tower);
+        money += towerCost;
+        MenuScreen.displayMoney();
     }
 
     public void lowerFireRate() {
@@ -409,10 +420,23 @@ public class GameScreen extends JPanel{
             range = newRange;
         }
     }
+
+    public static int getMoney(){ return money; }
+    public static int getTowerCost(){ return towerCost; }
+    public static int getEnergyTowerCost(){ return energyTowerCost; }
+    public void useMoney(int cost){ 
+        money -= cost; 
+        MenuScreen.displayMoney();
+    }
 }
 
 /*
  * add a boss every 10 waves
- * add tower upgrades (range, atk speed, damage) for each tower when clicked
+ * add currency system
+ * check if upgrade was clicked
+ * determine if money is more than towerCost
+ * place tower and take away cost from money
+ * if money is lower than towerCost, display to the user that they do not have enough money
+ * 
  * add different types of towers
  */
