@@ -37,6 +37,11 @@ public class Enemy {
         this.health = 1;
     }
 
+    /*
+    Description: updates enemy positions based on where they are on the map
+    Pre-Condition: instance of Enemy has to exist in gameScreen
+    Post-Condition: returns a boolean value if the enemy has reached the end or not
+     */
     public boolean update() {
         // Convert grid position to pixel position
         int targetX = mapX * 64;

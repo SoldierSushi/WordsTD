@@ -4,10 +4,16 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -20,6 +26,7 @@ public class Game extends JFrame{
     private CardLayout cardLayout;
     private JPanel mainPanel;
     private JLabel titleLabel;
+    private Clip clip;
 
     public Game(){
 
@@ -40,9 +47,16 @@ public class Game extends JFrame{
 
         add(mainPanel);
 
+        playMusic("src/Main/converted_youtube_edwooGpMg8g_audio.wav");
+
         setVisible(true);
     }
 
+    /*
+    Description: imports png image to use for sprites
+    Pre-Condition: Game class needs to be run
+    Post-Condition: sets BufferedImage img to the png
+     */
     private void importImg(){
         InputStream is = getClass().getResourceAsStream("/Main/towerDefense_tilesheet.png");
         try {
@@ -52,6 +66,11 @@ public class Game extends JFrame{
         }
     }
 
+    /*
+    Description: creates the game screen where the user plays the game
+    Pre-Condition: Game class needs to be run
+    Post-Condition: returns the values in gamePanel and sets them to the actual gamePanel
+     */  
     private JPanel createGameScreen() {
         JPanel gamePanel = new JPanel(null);
     
@@ -73,6 +92,11 @@ public class Game extends JFrame{
         return gamePanel;
     }
 
+    /*
+    Description: creates the game screen where the user plays the game
+    Pre-Condition: Game class needs to be run
+    Post-Condition: returns the values in gamePanel and sets them to the actual gamePanel
+     */
     private JPanel createStartScreen() {
         JPanel startScreen = new JPanel(null);
 
@@ -91,6 +115,29 @@ public class Game extends JFrame{
         return startScreen;
     }
 
+    /*
+    Description: plays audio based on the wav. file provided
+    Pre-Condition: Game class needs to be run
+    Post-Condition: plays audioFile and loops while playing
+     */
+    private void playMusic(String filePath){
+        try {
+            File audioFile = new File(filePath);
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+            clip = AudioSystem.getClip();
+            clip.open(audioStream);
+            clip.loop(Clip.LOOP_CONTINUOUSLY);
+            clip.start();
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*
+    Description: runs the constructor for Game class
+    Pre-Condition: None
+    Post-Condition: creates a new instance of Game constructor
+     */
     public static void main(String[] args){
         new Game();
     }

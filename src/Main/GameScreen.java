@@ -41,7 +41,7 @@ public class GameScreen extends JPanel{
     private long currentTime;
     private long lastUpdateTimeEnergy;
     private long currentTimeEnergy;
-    private static int wave = 19;
+    private static int wave = 1;
     private static int userHP = 3;
     private static int enemyCounter = 0;
     private long lastSpawnTime = 0;
@@ -53,7 +53,7 @@ public class GameScreen extends JPanel{
     private int amountOfEnemies = 0;
     private int range = 160;
     private int rangeCost = 4;
-    private static int money = 1000;
+    private static int money = 20;
     private static int towerCost = 20;
     private static int energyTowerCost = 100;
     private Tower hoveredTower = null;
@@ -183,7 +183,7 @@ public class GameScreen extends JPanel{
                         if (x >= 0 && x < size && y >= 0 && y < size) {
                             if (map[y][x] == 0) {
                                 map[y][x] = 3;
-                                energyTowers.add(new EnergyTower(x, y, img.getSubimage(20 * 64, 10 * 64, 64, 64), 1));
+                                energyTowers.add(new EnergyTower(x, y, img.getSubimage(20 * 64, 10 * 64, 64, 64), 3));
                             }
                         }
                         MenuScreen.flipEnergyTowerValue();
