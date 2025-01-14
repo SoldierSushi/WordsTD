@@ -53,7 +53,7 @@ public class GameScreen extends JPanel{
     private int amountOfEnemies = 0;
     private int range = 160;
     private int rangeCost = 4;
-    private static int money = 20;
+    private static int money = 200;
     private static int towerCost = 20;
     private static int energyTowerCost = 100;
     private Tower hoveredTower = null;
@@ -157,7 +157,7 @@ public class GameScreen extends JPanel{
                         if (x >= 0 && x < size && y >= 0 && y < size) {
                             if (map[y][x] == 0) { // Only place a tower on empty tiles
                                 map[y][x] = 2; // Mark the tile as occupied
-                                towers.add(new Tower(x, y, img.getSubimage(19 * 64, 10 * 64, 64, 64), fireRate, range));
+                                towers.add(new Tower(x, y, img.getSubimage(20 * 64, 8 * 64, 64, 64), fireRate, range));
                             }
                         }
                         MenuScreen.flipTowerAttackValue();
@@ -183,7 +183,7 @@ public class GameScreen extends JPanel{
                         if (x >= 0 && x < size && y >= 0 && y < size) {
                             if (map[y][x] == 0) {
                                 map[y][x] = 3;
-                                energyTowers.add(new EnergyTower(x, y, img.getSubimage(20 * 64, 10 * 64, 64, 64), 3));
+                                energyTowers.add(new EnergyTower(x, y, img.getSubimage(21 * 64, 8 * 64, 64, 64), 3));
                             }
                         }
                         MenuScreen.flipEnergyTowerValue();

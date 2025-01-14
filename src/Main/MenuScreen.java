@@ -177,9 +177,9 @@ public class MenuScreen extends JPanel implements KeyListener{
     public static void displayEnergy(){ energyLabel.setText("Typing Energy: " + energy); }
     public static void displayHealth(){ userHPLabel.setText("Health: " + GameScreen.getUserHP()); }
     public static void displayWave(){ waveLabel.setText("Wave: " + GameScreen.getWave());}
-    public static void displayMoney(){ moneyLabel.setText("Money: " + GameScreen.getMoney()); }
-    public static void displayTowerCost(){ towerAttackButton.setText("Attack Tower : " + GameScreen.getTowerCost()); }
-    public static void displayEnergyTowerCost(){ EnergyTowerButton.setText("Energy Tower : " + GameScreen.getEnergyTowerCost()); }
+    public static void displayMoney(){ moneyLabel.setText("Money: $" + GameScreen.getMoney()); }
+    public static void displayTowerCost(){ towerAttackButton.setText("Attack Tower : $" + GameScreen.getTowerCost()); }
+    public static void displayEnergyTowerCost(){ EnergyTowerButton.setText("Energy Tower : $" + GameScreen.getEnergyTowerCost()); }
 
 
     public static boolean isGameTrue(){ return play; }
