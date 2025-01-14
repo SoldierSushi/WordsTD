@@ -77,14 +77,11 @@ public class Tower {
         return null;
     }
 
-    public void setFireRate(double fireRate) {
-        this.fireRate = fireRate;
-    }
+    public double getFireRate(){ return fireRate; }
+    public void setFireRate(double fireRateRemove) { this.fireRate -= fireRateRemove; }
 
     public int getRange(){ return range; }
-    public void setRange(int rangeAdd) {
-        this.range += rangeAdd;
-    }
+    public void setRange(int rangeAdd) { this.range += rangeAdd; }
 
     public void draw(Graphics g, double angleToEnemy) {
         Graphics2D g2d = (Graphics2D) g;

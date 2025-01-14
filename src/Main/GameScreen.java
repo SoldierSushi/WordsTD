@@ -41,7 +41,7 @@ public class GameScreen extends JPanel{
     private long currentTime;
     private long lastUpdateTimeEnergy;
     private long currentTimeEnergy;
-    private static int wave = 1;
+    private static int wave = 19;
     private static int userHP = 3;
     private static int enemyCounter = 0;
     private long lastSpawnTime = 0;
@@ -49,12 +49,16 @@ public class GameScreen extends JPanel{
     private int hoveredTileX = -1;
     private int hoveredTileY = -1;
     private double fireRate = 1;
-    private double amountOfEnemies = 0;
+    private int fireRateCost = 15;
+    private int amountOfEnemies = 0;
     private int range = 160;
-    private static int money = 100;
+    private int rangeCost = 4;
+    private static int money = 1000;
     private static int towerCost = 20;
     private static int energyTowerCost = 100;
     private Tower hoveredTower = null;
+    private JMenuItem fireRateOption;
+    private JMenuItem rangeOption;
     
         public GameScreen(BufferedImage img, MenuScreen menuScreen) {
             this.img = img;
@@ -78,7 +82,7 @@ public class GameScreen extends JPanel{
                 public void run() { 
                     fps = 0;
                     double spawnSpeed = 1.6 * Math.pow(0.9, wave);
-                    amountOfEnemies += 5 * Math.pow(1.2, wave);
+                    amountOfEnemies += 5 * (int) Math.pow(1.1, wave);
                     System.out.println("Spawn Speed: " + spawnSpeed);
                     System.out.println("Enemies to spawn: " + amountOfEnemies);
                     float spawnInterval = 1000000000 * (float) spawnSpeed ; // 1 second in nanoseconds
@@ -359,7 +363,7 @@ public class GameScreen extends JPanel{
     
         public static void checkWaveComplete(){
             if(enemies.isEmpty() && allEnemiesMade){
-                if(wave == 50){
+                if(wave == 20){
                     Object[] options = {"Yes", "No"};
                     int gameContinue = JOptionPane.showOptionDialog(null, "You win! Would you like to play infinite mode?", "You Win",JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,null,options, options[0]);
                     
@@ -411,10 +415,10 @@ public class GameScreen extends JPanel{
     private void showUpgradeMenu(int x, int y, Tower tower){
         JPopupMenu upgradeMenu = new JPopupMenu();
 
-        JMenuItem fireRateOption =  new JMenuItem("Upgrade atk speed");
+        fireRateOption =  new JMenuItem("Upgrade atk speed: $15");
         fireRateOption.addActionListener(e -> lowerFireRate(tower));
 
-        JMenuItem rangeOption =  new JMenuItem("Upgrade range");
+        rangeOption =  new JMenuItem("Upgrade range: $4");
         rangeOption.addActionListener(e -> increaseRange(tower));
 
         upgradeMenu.add(fireRateOption);
@@ -453,13 +457,28 @@ public class GameScreen extends JPanel{
     }
 
     public void lowerFireRate(Tower tower) {
-        double newFireRate = fireRate - 0.1;
-        tower.setFireRate(newFireRate);
-        fireRate = newFireRate;
+        if(tower.getFireRate() <= 0.31){
+            JOptionPane.showOptionDialog(null, "You have maxed out this upgrade","Maxed Out Upgrade", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, new Object[]{"OK"}, "OK");
+        }else{
+            if(money >= fireRateCost){
+                    money -= fireRateCost;
+                    tower.setFireRate(0.1);
+                    System.out.println("tower fire rate: " + tower.getFireRate());
+                    MenuScreen.displayMoney();
+            }else{
+                JOptionPane.showOptionDialog(null, "You do not have enough money to buy this upgrade","Insufficient Funds", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, new Object[]{"OK"}, "OK");
+            }
+        }
     }
 
     public void increaseRange(Tower tower) {
-        tower.setRange(40);
+        if (money >= rangeCost) {
+            money -= rangeCost;
+            tower.setRange(40);
+            MenuScreen.displayMoney();
+        }else{
+            JOptionPane.showOptionDialog(null, "You do not have enough money to buy this upgrade","Insufficient Funds", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, new Object[]{"OK"}, "OK");
+        }
     }
 
     public static int getMoney(){ return money; }
