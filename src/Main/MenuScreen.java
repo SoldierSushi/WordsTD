@@ -38,9 +38,8 @@ public class MenuScreen extends JPanel implements KeyListener{
     public MenuScreen(){
         setLayout(null);
         setBounds(832, 0, 200, 860);
-        addKeyListener(this);
-        setFocusable(true);
         requestFocusInWindow();
+        addKeyListener(this);
 
         titleLabel = new JLabel("MENU", SwingConstants.CENTER);
         titleLabel.setBounds(0, 0, 200, 50);
@@ -146,6 +145,14 @@ public class MenuScreen extends JPanel implements KeyListener{
         add(userHPLabel);
         add(waveLabel);
         add(moneyLabel);
+    }
+
+    @Override
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+        if (visible) {
+            requestFocusInWindow(); // Re-request focus when visible
+        }
     }
 
     //used in gamescreen for towerAttack

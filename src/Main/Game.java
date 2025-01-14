@@ -2,6 +2,8 @@ package Main;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -11,13 +13,16 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 public class Game extends JFrame{
 
     private BufferedImage img;
     private CardLayout cardLayout;
     private JPanel mainPanel;
+    private JLabel titleLabel;
 
     public Game(){
 
@@ -61,17 +66,31 @@ public class Game extends JFrame{
     
         gamePanel.add(menuScreen);
         gamePanel.add(gameScreen);
+
+        gamePanel.addHierarchyListener(e -> {
+            if ((e.getChangeFlags() & e.SHOWING_CHANGED) != 0 && gamePanel.isShowing()) {
+                menuScreen.requestFocusInWindow();
+            }
+        });
     
         return gamePanel;
     }
 
     private JPanel createStartScreen() {
-        JPanel startScreen = new JPanel();
-        startScreen.setLayout(new BorderLayout());
+        JPanel startScreen = new JPanel(null);
+
+        titleLabel = new JLabel("WORDS TD");
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        titleLabel.setBounds(0, 300, 1032, 100);
+        titleLabel.setForeground(Color.BLACK); // Set text color
+        titleLabel.setFont(new Font("Georgia", Font.BOLD, 64));
 
         JButton startButton = new JButton("Start");
+        startButton.setBounds(316, 400, 400, 100);
         startButton.addActionListener(e -> cardLayout.show(mainPanel, "Game"));
-        startScreen.add(startButton, BorderLayout.CENTER);
+
+        startScreen.add(startButton);
+        startScreen.add(titleLabel);
         return startScreen;
     }
 
