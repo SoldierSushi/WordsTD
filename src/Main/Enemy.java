@@ -1,6 +1,7 @@
 package Main;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
@@ -25,6 +26,7 @@ public class Enemy {
         {0,50,0,0,0,0,0,0,0,0,0,0,0},
         {0,51,52,53,54,55,56,57,58,59,60,61,62},
     };
+    private double angle = 0;
 
     public Enemy(int enemyX, int enemyY, BufferedImage image) {
         this.enemyX = enemyX;
@@ -69,12 +71,16 @@ public class Enemy {
         // Check adjacent cells in a fixed order: right, down, left, up
         if (enemyPathMap[mapY][mapX + 1] > enemyPathMap[mapY][mapX]) {
             mapX += 1; // Move right
+            angle = 0; 
         } else if (enemyPathMap[mapY + 1][mapX] > enemyPathMap[mapY][mapX]) {
             mapY += 1; // Move down
+            angle = 90;
         } else if (enemyPathMap[mapY][mapX - 1] > enemyPathMap[mapY][mapX]) {
             mapX -= 1; // Move left
+            angle = 180;
         } else if (enemyPathMap[mapY - 1][mapX] > enemyPathMap[mapY][mapX]) {
             mapY -= 1; // Move up
+            angle = 270;
         }
     }
 
@@ -97,7 +103,11 @@ public class Enemy {
     }
 
     public void draw(Graphics g) {
-        g.drawImage(image, enemyX, enemyY, null);
+        Graphics2D g2d = (Graphics2D) g;
+        var originalTransform = g2d.getTransform();
+        g2d.translate(enemyX + 32, enemyY + 32);
+        g2d.rotate(Math.toRadians(angle));
+        g.drawImage(image, -32, -32, null);
+        g2d.setTransform(originalTransform);
     }
-
 }

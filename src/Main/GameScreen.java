@@ -307,7 +307,7 @@ public class GameScreen extends JPanel{
             long currentSpawnTime = System.nanoTime();
             if (currentSpawnTime - lastSpawnTime >= spawnInterval) {
                 if(enemyCounter < amountOfEnemies){
-                    enemies.add(new Enemy(0, 64, img.getSubimage(20 * 64, 6 * 64, 64, 64)));
+                    enemies.add(new Enemy(0, 64, img.getSubimage(18 * 64, 11 * 64, 64, 64)));
                     lastSpawnTime = currentSpawnTime;
                     enemyCounter++;
                 }
