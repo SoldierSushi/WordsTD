@@ -39,7 +39,7 @@ public class Projectile {
     }
 
     public void draw(Graphics g) {
-        g.setColor(Color.YELLOW);
+        g.setColor(Color.RED);
         g.fillRect((int) x - 2, (int) y - 2, 4, 4);
     }
 }

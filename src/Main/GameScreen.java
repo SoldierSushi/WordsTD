@@ -53,7 +53,7 @@ public class GameScreen extends JPanel{
     private int amountOfEnemies = 0;
     private int range = 160;
     private int rangeCost = 4;
-    private static int money = 200;
+    private static int money = 20;
     private static int towerCost = 20;
     private static int energyTowerCost = 100;
     private Tower hoveredTower = null;
@@ -82,7 +82,7 @@ public class GameScreen extends JPanel{
                 public void run() { 
                     fps = 0;
                     double spawnSpeed = 1.6 * Math.pow(0.9, wave);
-                    amountOfEnemies += 5 * (int) Math.pow(1.1, wave);
+                    amountOfEnemies += 3 * (int) Math.pow(1.1, wave);
                     System.out.println("Spawn Speed: " + spawnSpeed);
                     System.out.println("Enemies to spawn: " + amountOfEnemies);
                     float spawnInterval = 1000000000 * (float) spawnSpeed ; // 1 second in nanoseconds
