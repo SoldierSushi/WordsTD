@@ -128,7 +128,6 @@ public class GameScreen extends JPanel{
             @Override
             public void run() { 
                 while(true){
-                    //displays fps in console
                     if (fps == 30) {
                         System.out.println("FPS: " + fps);
                         fps = 0;
@@ -222,13 +221,14 @@ public class GameScreen extends JPanel{
                 if (x >= 0 && x < size && y >= 0 && y < size) {
                     hoveredTileX = x;
                     hoveredTileY = y;
-                    repaint(); // Repaint to update visual changes if necessary
-                } else {
+                    repaint();
+                } else { // Mouse is outside the grid, no need to repaint
                     hoveredTileX = -1;
-                    hoveredTileY = -1; // Mouse is outside the grid
+                    hoveredTileY = -1;
                 }
 
-                hoveredTower = null; // Reset hoveredTower
+                hoveredTower = null;
+
                 for (Tower tower : towers) {
                     if (new Rectangle(tower.getX(), tower.getY(), 64, 64).contains(x*64, y*64)) {
                         hoveredTower = tower;
@@ -268,7 +268,6 @@ public class GameScreen extends JPanel{
         }
 
         for(Tower tower : towers){
-
             Enemy nearestEnemy = tower.nearestEnemy(enemies);
             angleToEnemy = 0;
 
@@ -299,7 +298,7 @@ public class GameScreen extends JPanel{
 
         for(EnergyTower energyTower : energyTowers){
             currentTimeEnergy = System.nanoTime();
-            float deltaTimeEnergy = (currentTimeEnergy - lastUpdateTimeEnergy) / 1_000_000_000.0f;  // Convert to seconds
+            float deltaTimeEnergy = (currentTimeEnergy - lastUpdateTimeEnergy) / 1_000_000_000.0f;
             energyTower.harvestEnergy(deltaTimeEnergy);
             energyTower.draw(g);
         }
@@ -332,7 +331,7 @@ public class GameScreen extends JPanel{
 
     /*
     Description: creates new enemies
-    Pre-Condition: run every time a new instance of gameThread is created, requires a double for spawn interval
+    Pre-Condition: run every time a new instance of gameThread is created, requires 1 double
     Post-Condition: adds an enemy to a the ArrayList enemies to keep track of their actions
     */
     public void makeEnemies(double spawnInterval){
@@ -375,14 +374,14 @@ public class GameScreen extends JPanel{
 
     /*
     Description: damages the frontmost enemy if a word was typed correctly
-    Pre-Condition: requires int damage, only called once a word has been typed correctly
+    Pre-Condition: called once a word has been typed correctly: requires 1 int
     Post-Condition: removes first iteration of enemy in ArrayList enemies
     */
     public void damageFirstEnemy(int damage) {
         if (!enemies.isEmpty()) {
             Enemy firstEnemy = enemies.get(0);
             if (firstEnemy.takeDamage(damage)) {
-                enemies.remove(firstEnemy); // Remove if health is 0
+                enemies.remove(firstEnemy);
                 money += 5;
                 System.out.println("Enemy with text!");
                 checkWaveComplete();
@@ -392,7 +391,7 @@ public class GameScreen extends JPanel{
 
     /*
     Description: updates the projectiles motion
-    Pre-Condition: requires Graphics g, called every time paintComponent is run
+    Pre-Condition: called every time paintComponent is run: requires 1 Graphics
     Post-Condition: changes each projectile's position on the game, also checks if out of bounds or hit an enemy
     */
     private void updateProjectiles(Graphics g){
@@ -467,7 +466,7 @@ public class GameScreen extends JPanel{
 
     /*
     Description: shows the tower menu if tower is clicked
-    Pre-Condition: called only if mouse is clicked onto a tower: requires int x, int y, and Tower tower (selected tower)
+    Pre-Condition: called only if mouse is clicked onto a tower: requires 2 int, 1 Tower (selected tower)
     Post-Condition: shows a JPopupMenu menu originating at the selected tower's center
     */
     private void showTowerMenu(int x, int y, Tower tower) {
@@ -487,7 +486,7 @@ public class GameScreen extends JPanel{
 
     /*
     Description: shows the upgrade options for tower
-    Pre-Condition: called only if JMenuItem upgradeOption is selected: requires int x, int y, Tower tower
+    Pre-Condition: called only if JMenuItem upgradeOption is selected: requires 2 int, 1 Tower
     Post-Condition: shows new JPopupMenu with upgrade options
     */
     private void showUpgradeMenu(int x, int y, Tower tower){
@@ -507,7 +506,7 @@ public class GameScreen extends JPanel{
 
     /*
     Description: sells the selected tower
-    Pre-Condition: called only if sellOption is selected: requires int x, int y, Tower tower
+    Pre-Condition: called only if sellOption is selected: requires 2 int, 1 Tower
     Post-Condition: sets the towers location in the map grid to 0 (nothing placed there) and changes prices to be cheaper
     */
     public void sellTower(int x, int y, Tower tower){
@@ -521,7 +520,7 @@ public class GameScreen extends JPanel{
 
     /*
     Description: shows the energy tower menu if clicked
-    Pre-Condition: called only if mouse is clicked onto an existing energy tower: requires int x, int y, EnergyTower energyTower
+    Pre-Condition: called only if mouse is clicked onto an existing energy tower: requires 2 int, 1 EnergyTower
     Post-Condition: creates a JPopupMenu menu originating at the center of the energy tower with the option to sell
     */
     private void showEnergyTowerMenu(int x, int y, EnergyTower energyTower) {
@@ -537,7 +536,7 @@ public class GameScreen extends JPanel{
 
     /*
     Description: sells the selected energy tower
-    Pre-Condition: called only if JMenuOption sellOption is selected: requires int x, int y, EnergyTower energyTower
+    Pre-Condition: called only if JMenuOption sellOption is selected: requires 2 int, 1 EnergyTower
     Post-Condition: sets the energy tower's location on the map grid to 0 and changes prices to be cheaper
     */
     public void sellEnergyTower(int x, int y, EnergyTower energyTower){
@@ -551,7 +550,7 @@ public class GameScreen extends JPanel{
 
     /*
     Description: lowers the "reload" time for attack towers
-    Pre-Condition: called only if JMenuItem fireRateOption is selected: requires Tower tower
+    Pre-Condition: called only if JMenuItem fireRateOption is selected: requires 1 Tower
     Post-Condition: lowers the selected tower's fireRate by 0.1, uses money and displays new money amount
     */
     public void lowerFireRate(Tower tower) {
@@ -571,7 +570,7 @@ public class GameScreen extends JPanel{
 
     /*
     Description: increases the range of the attack towers
-    Pre-Condition: called only if JMenuItem rangeOption is selected: requires Tower tower
+    Pre-Condition: called only if JMenuItem rangeOption is selected: requires 1 Tower
     Post-Condition: increases the selected tower's range by 40, uses money and displays new money amount
     */
     public void increaseRange(Tower tower) {
@@ -607,7 +606,7 @@ public class GameScreen extends JPanel{
 
     /*
     Description: uses user's money to buy attack tower
-    Pre-Condition: called only if attack tower is placed onto the map: requires int cost
+    Pre-Condition: called only if attack tower is placed onto the map: requires 1 int
     Post-Condition: subtracts the user's money by the cost of the attack tower, displays new money and towerCost values in MenuScreen
     */
     public void useMoneyForAttackTower(int cost){ 
@@ -619,7 +618,7 @@ public class GameScreen extends JPanel{
 
     /*
     Description: uses user's money to buy energy tower
-    Pre-Condition: called only if energy tower is placed onto the map: requires int cost
+    Pre-Condition: called only if energy tower is placed onto the map: requires 1 int
     Post-Condition: subtracts the user's money by the cost of the energy tower, displays new money and towerCost values in MenuScreen
     */
     public void useMoneyForEnergyTower(int cost){ 
@@ -635,4 +634,6 @@ public class GameScreen extends JPanel{
  * organize code (move all jumbled code in GameScreen to their respective classes)
  * add boss every 10 waves
  * add different types of towers
+ * add different types of enemies
+ * have enemies have different amounts of health
  */
