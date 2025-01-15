@@ -60,331 +60,388 @@ public class GameScreen extends JPanel{
     private JMenuItem fireRateOption;
     private JMenuItem rangeOption;
     
-        public GameScreen(BufferedImage img, MenuScreen menuScreen) {
-            this.img = img;
-    
-            preloadBackground();
-            startTowerPlacingThread();
-            startGameThread();
-            setupMouseListener();
-            setupMouseMotionListener();
-    
-            setBounds(0,0, 832, 860);
-            lastUpdateTime = System.nanoTime();
-            
-            menuScreen.setWordCompletedCallback(() -> damageFirstEnemy(menuScreen.getWordTyped().length()));
-            menuScreen.startGameCallback(this::startGameThread);
-        }
-    
-        public void startGameThread(){
-            Thread gameThread = new Thread(new Runnable() {
-                @Override
-                public void run() { 
-                    fps = 0;
-                    double spawnSpeed = 1.6 * Math.pow(0.9, wave);
-                    amountOfEnemies += 3 * (int) Math.pow(1.1, wave);
-                    System.out.println("Spawn Speed: " + spawnSpeed);
-                    System.out.println("Enemies to spawn: " + amountOfEnemies);
-                    float spawnInterval = 1000000000 * (float) spawnSpeed ; // 1 second in nanoseconds
-                    lastSpawnTime = System.nanoTime();
-                    while(MenuScreen.isGameTrue()){
-                        makeEnemies(spawnInterval);
+    public GameScreen(BufferedImage img, MenuScreen menuScreen) {
+        this.img = img;
+
+        preloadBackground();
+        startTowerPlacingThread();
+        startGameThread();
+        setupMouseListener();
+        setupMouseMotionListener();
+
+        setBounds(0,0, 832, 860);
+        lastUpdateTime = System.nanoTime();
         
-                        //displays fps in console
-                        if (fps == 30) {
-                            System.out.println("FPS: " + fps);
-                            fps = 0;
-                        } else {
-                            fps++;
-                        }
+        menuScreen.setWordCompletedCallback(() -> damageFirstEnemy(menuScreen.getWordTyped().length()));
+        menuScreen.startGameCallback(this::startGameThread);
+    }
 
-                        //real stuff
-                        updateEnemies();
-
-                        //saves cpu usage
-                        long frameTime = System.nanoTime();
-                        try {
-                            long sleepTime = Math.max(0, 33 - (System.nanoTime() - frameTime) / 1_000_000);
-                            Thread.sleep(sleepTime);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }, "gameThread");
-            gameThread.start();
-        }
-
-        public void startTowerPlacingThread(){
-            Thread towerPlacingThread = new Thread(new Runnable() {
-                @Override
-                public void run() { 
-                    while(true){
-                        //displays fps in console
-                        if (fps == 30) {
-                            System.out.println("FPS: " + fps);
-                            fps = 0;
-                        } else {
-                            fps++;
-                        }
-
-                        //real stuff
-                        repaint();
-
-                        //saves cpu usage
-                        long frameTime = System.nanoTime();
-                        try {
-                            long sleepTime = Math.max(0, 33 - (System.nanoTime() - frameTime) / 1_000_000);
-                            Thread.sleep(sleepTime);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }, "towerPlacingThread");
-            towerPlacingThread.start();
-        }
+    /*
+    Description: starts the game loop, updating game components in specified intervals
+    Pre-Condition: called by GameScreen constructor, also called when recieving callback from menuScreen
+    Post-Condition: creates a new Thread gameThread and runs game functions
+    */
+    public void startGameThread(){
+        Thread gameThread = new Thread(new Runnable() {
+            @Override
+            public void run() { 
+                fps = 0;
+                double spawnSpeed = 1.6 * Math.pow(0.9, wave);
+                amountOfEnemies += 3 * (int) Math.pow(1.1, wave);
+                System.out.println("Spawn Speed: " + spawnSpeed);
+                System.out.println("Enemies to spawn: " + amountOfEnemies);
+                float spawnInterval = 1000000000 * (float) spawnSpeed ; // 1 second in nanoseconds
+                lastSpawnTime = System.nanoTime();
+                while(MenuScreen.isGameTrue()){
+                    makeEnemies(spawnInterval);
     
-        private void setupMouseListener() {
-            addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    System.out.println("mouse clicked");
-                    int x = e.getX() / 64;
-                    int y = e.getY() / 64;
-                    
-                    if(MenuScreen.isTowerAttackOn()){
-                        if (x >= 0 && x < size && y >= 0 && y < size) {
-                            if (map[y][x] == 0) { // Only place a tower on empty tiles
-                                map[y][x] = 2; // Mark the tile as occupied
-                                towers.add(new Tower(x, y, img.getSubimage(20 * 64, 8 * 64, 64, 64), fireRate, range));
-                            }
-                        }
-                        MenuScreen.flipTowerAttackValue();
-                        useMoneyForAttackTower(getTowerCost());
-                        MenuScreen.displayMoney();
-
-                    }else if(map[y][x] == 2){
-                        for (Tower tower : towers) {
-                            if (tower.getX() / 64 == x && tower.getY() / 64 == y) {
-                                showTowerMenu(x * 64, y * 64, tower);
-                                return;
-                            }
-                        }
-                    }else if(map[y][x] == 3){
-                        for (EnergyTower energyTower : energyTowers) {
-                            if (energyTower.getX() / 64 == x && energyTower.getY() / 64 == y) {
-                                showEnergyTowerMenu(x * 64, y * 64, energyTower);
-                                return;
-                            }
-                        }
-
-                    }else if(MenuScreen.isEnergyTowerOn()){
-                        if (x >= 0 && x < size && y >= 0 && y < size) {
-                            if (map[y][x] == 0) {
-                                map[y][x] = 3;
-                                energyTowers.add(new EnergyTower(x, y, img.getSubimage(21 * 64, 8 * 64, 64, 64), 3));
-                            }
-                        }
-                        MenuScreen.flipEnergyTowerValue();
-                        useMoneyForEnergyTower(getEnergyTowerCost());
-                        MenuScreen.displayMoney();
-                    }
-                }
-            });
-        }
-
-        private void setupMouseMotionListener() {
-            addMouseMotionListener(new MouseAdapter() {
-                @Override
-                public void mouseMoved(MouseEvent e) {
-                    int x = e.getX() / 64;
-                    int y = e.getY() / 64;
-
-                    if (x >= 0 && x < size && y >= 0 && y < size) {
-                        hoveredTileX = x;
-                        hoveredTileY = y;
-                        repaint(); // Repaint to update visual changes if necessary
+                    if (fps == 30) {
+                        System.out.println("FPS: " + fps);
+                        fps = 0;
                     } else {
-                        hoveredTileX = -1;
-                        hoveredTileY = -1; // Mouse is outside the grid
+                        fps++;
                     }
 
-                    hoveredTower = null; // Reset hoveredTower
-                    for (Tower tower : towers) {
-                        if (new Rectangle(tower.getX(), tower.getY(), 64, 64).contains(x*64, y*64)) {
-                            hoveredTower = tower;
-                            break;
+                    updateEnemies();
+
+                    //saves cpu usage, sets frame rate to 30
+                    long frameTime = System.nanoTime();
+                    try {
+                        long sleepTime = Math.max(0, 33 - (System.nanoTime() - frameTime) / 1_000_000);
+                        Thread.sleep(sleepTime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }, "gameThread");
+        gameThread.start();
+    }
+
+    /*
+    Description: contantly running thread to check for tower placements and other functions that work outside the main game
+    Pre-Condition: called by GameScreen constructor
+    Post-Condition: creates a new Thread towerPlacingThread that runs for the entire duration of the game
+    */
+    public void startTowerPlacingThread(){
+        Thread towerPlacingThread = new Thread(new Runnable() {
+            @Override
+            public void run() { 
+                while(true){
+                    //displays fps in console
+                    if (fps == 30) {
+                        System.out.println("FPS: " + fps);
+                        fps = 0;
+                    } else {
+                        fps++;
+                    }
+
+                    //real stuff
+                    repaint();
+
+                    //saves cpu usage
+                    long frameTime = System.nanoTime();
+                    try {
+                        long sleepTime = Math.max(0, 33 - (System.nanoTime() - frameTime) / 1_000_000);
+                        Thread.sleep(sleepTime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }, "towerPlacingThread");
+        towerPlacingThread.start();
+    }
+
+    /*
+    Description: checks mouse clicks for interaction during game
+    Pre-Condition: called by GameScreen construct
+    Post-Condition: sets a MouseAdapter to watch for any mouse interactions from user for the entire duration of game
+    */
+    private void setupMouseListener() {
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                System.out.println("mouse clicked");
+                int x = e.getX() / 64;
+                int y = e.getY() / 64;
+                
+                if(MenuScreen.isTowerAttackOn()){
+                    if (x >= 0 && x < size && y >= 0 && y < size) {
+                        if (map[y][x] == 0) {
+                            map[y][x] = 2;
+                            towers.add(new Tower(x, y, img.getSubimage(20 * 64, 8 * 64, 64, 64), fireRate, range));
                         }
                     }
+                    MenuScreen.flipTowerAttackValue();
+                    useMoneyForAttackTower(getTowerCost());
+                    MenuScreen.displayMoney();
+
+                }else if(map[y][x] == 2){
+                    for (Tower tower : towers) {
+                        if (tower.getX() / 64 == x && tower.getY() / 64 == y) {
+                            showTowerMenu(x * 64, y * 64, tower);
+                            return;
+                        }
+                    }
+                }else if(map[y][x] == 3){
+                    for (EnergyTower energyTower : energyTowers) {
+                        if (energyTower.getX() / 64 == x && energyTower.getY() / 64 == y) {
+                            showEnergyTowerMenu(x * 64, y * 64, energyTower);
+                            return;
+                        }
+                    }
+
+                }else if(MenuScreen.isEnergyTowerOn()){
+                    if (x >= 0 && x < size && y >= 0 && y < size) {
+                        if (map[y][x] == 0) {
+                            map[y][x] = 3;
+                            energyTowers.add(new EnergyTower(x, y, img.getSubimage(21 * 64, 8 * 64, 64, 64), 3));
+                        }
+                    }
+                    MenuScreen.flipEnergyTowerValue();
+                    useMoneyForEnergyTower(getEnergyTowerCost());
+                    MenuScreen.displayMoney();
                 }
-            });
-        }
-             
-        @Override
-        public void paintComponent(Graphics g){
-            super.paintComponent(g);
-            double angleToEnemy = 0;
-            float transparency = 0.5f;
-            Graphics2D hover = (Graphics2D) g;
+            }
+        });
+    }
+
+    /*
+    Description: checks if the user is hovering over tower
+    Pre-Condition: called by GameScreen constructor
+    Post-Condition: uses MouseAdapter to set hoveredTower to the selected tower
+    */
+    private void setupMouseMotionListener() {
+        addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                int x = e.getX() / 64;
+                int y = e.getY() / 64;
+
+                if (x >= 0 && x < size && y >= 0 && y < size) {
+                    hoveredTileX = x;
+                    hoveredTileY = y;
+                    repaint(); // Repaint to update visual changes if necessary
+                } else {
+                    hoveredTileX = -1;
+                    hoveredTileY = -1; // Mouse is outside the grid
+                }
+
+                hoveredTower = null; // Reset hoveredTower
+                for (Tower tower : towers) {
+                    if (new Rectangle(tower.getX(), tower.getY(), 64, 64).contains(x*64, y*64)) {
+                        hoveredTower = tower;
+                        break;
+                    }
+                }
+            }
+        });
+    }
             
-            if(MenuScreen.isEnergyTowerOn() || MenuScreen.isTowerAttackOn()){
-                hover.setColor(Color.BLACK);
-                hover.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, transparency));
-                hover.fillRect(hoveredTileX * 64, hoveredTileY * 64, 64, 64);
-            }
-
-            for(int y = 0; y < size; y++){
-                for(int x = 0; x < size; x++){
-                    g.drawImage(backGroundImages[y][x], x*64, y*64, null);
-                }
-            }
-    
-            for (Enemy enemy : new ArrayList<>(enemies)) {
-                enemy.draw(g);
-            }
-    
-            for(Tower tower : towers){
-    
-                Enemy nearestEnemy = tower.nearestEnemy(enemies);
-                angleToEnemy = 0;
-    
-                currentTime = System.nanoTime();
-                float deltaTime = (currentTime - lastUpdateTime) / 1_000_000_000.0f;  // Convert to seconds
-    
-                if (nearestEnemy != null) {
-                    angleToEnemy = tower.angleToNearestEnemy(nearestEnemy);
-                    Projectile newProjectile = tower.shoot(40, angleToEnemy, deltaTime);
-                    if (newProjectile != null) {
-                        projectiles.add(newProjectile);
-                    }
-                }
-                
-                tower.draw(g, angleToEnemy);
-            }
-
-            if (hoveredTower != null) {
-                int centerX = hoveredTower.getX() + 32;
-                int centerY = hoveredTower.getY() + 32;
-                int showrange = hoveredTower.getRange(); 
-                g.setColor(new Color(255, 0, 0, 64)); // Semi-transparent blue
-                g.fillOval(centerX - showrange, centerY - showrange, showrange * 2, showrange * 2);
-                g.drawOval(centerX - showrange, centerY - showrange, showrange * 2, showrange * 2);
-            }
-
-            lastUpdateTime = currentTime;
-    
-            for(EnergyTower energyTower : energyTowers){
-                currentTimeEnergy = System.nanoTime();
-                float deltaTimeEnergy = (currentTimeEnergy - lastUpdateTimeEnergy) / 1_000_000_000.0f;  // Convert to seconds
-                energyTower.harvestEnergy(deltaTimeEnergy);
-                energyTower.draw(g);
-            }
-            lastUpdateTimeEnergy = currentTimeEnergy;
-    
-            if (projectiles != null) {
-                updateProjectiles(g);
-            }
-        }
-    
-        public void preloadBackground(){
-            backGroundImages = new Image[size][size];
-            for(int y = 0; y < size; y++){
-                for(int x = 0; x < size; x++){
-                    if(map[y][x] == 0){
-                        backGroundImages[y][x] = img.getSubimage(19*64, 6*64, 64, 64);
-                    }else if(map[y][x] == 1){
-                        backGroundImages[y][x] = img.getSubimage(21*64, 6*64, 64, 64);
-                    }else if(map[y][x] == 9){
-                        backGroundImages[y][x] = img.getSubimage(22*64, 4*64, 64, 64);
-                    }
-                }
-            }
-    
+    /*
+    Description: paints all images that are in the game onto
+    Pre-Condition: displays certain game components only if conditions are met (ex. hoveredTower != null)
+    Post-Condition: alters and displays game components on the screen
+    */
+    @Override
+    public void paintComponent(Graphics g){
+        super.paintComponent(g);
+        double angleToEnemy = 0;
+        float transparency = 0.5f;
+        Graphics2D hover = (Graphics2D) g;
+        
+        if(MenuScreen.isEnergyTowerOn() || MenuScreen.isTowerAttackOn()){
+            hover.setColor(Color.BLACK);
+            hover.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, transparency));
+            hover.fillRect(hoveredTileX * 64, hoveredTileY * 64, 64, 64);
         }
 
-        public void makeEnemies(double spawnInterval){
-            long currentSpawnTime = System.nanoTime();
-            if (currentSpawnTime - lastSpawnTime >= spawnInterval) {
-                if(enemyCounter < amountOfEnemies){
-                    enemies.add(new Enemy(0, 64, img.getSubimage(18 * 64, 11 * 64, 64, 64)));
-                    lastSpawnTime = currentSpawnTime;
-                    enemyCounter++;
-                }
-            }
-            if(enemyCounter == (amountOfEnemies)){
-                allEnemiesMade = true;
+        for(int y = 0; y < size; y++){
+            for(int x = 0; x < size; x++){
+                g.drawImage(backGroundImages[y][x], x*64, y*64, null);
             }
         }
-    
-        private void updateEnemies() {
-            // Use an iterator to safely remove enemies
-            Iterator<Enemy> iterator = enemies.iterator();
-            while (iterator.hasNext()) {
-                Enemy enemy = iterator.next();
-                if(enemy.isEnemyDead()){
-                    iterator.remove();
-                    money++;
-                    System.out.println("Enemy killed");
-                }else if (enemy.update()) {
-                    userLoseHP();
-                    iterator.remove();
-                    System.out.println("Enemy reached the end");
+
+        for (Enemy enemy : new ArrayList<>(enemies)) {
+            enemy.draw(g);
+        }
+
+        for(Tower tower : towers){
+
+            Enemy nearestEnemy = tower.nearestEnemy(enemies);
+            angleToEnemy = 0;
+
+            currentTime = System.nanoTime();
+            float deltaTime = (currentTime - lastUpdateTime) / 1_000_000_000.0f;  // Convert to seconds
+
+            if (nearestEnemy != null) {
+                angleToEnemy = tower.angleToNearestEnemy(nearestEnemy);
+                Projectile newProjectile = tower.shoot(40, angleToEnemy, deltaTime);
+                if (newProjectile != null) {
+                    projectiles.add(newProjectile);
                 }
-                MenuScreen.displayMoney();
+            }
+            
+            tower.draw(g, angleToEnemy);
+        }
+
+        if (hoveredTower != null) {
+            int centerX = hoveredTower.getX() + 32;
+            int centerY = hoveredTower.getY() + 32;
+            int showrange = hoveredTower.getRange(); 
+            g.setColor(new Color(255, 0, 0, 64)); // Semi-transparent blue
+            g.fillOval(centerX - showrange, centerY - showrange, showrange * 2, showrange * 2);
+            g.drawOval(centerX - showrange, centerY - showrange, showrange * 2, showrange * 2);
+        }
+
+        lastUpdateTime = currentTime;
+
+        for(EnergyTower energyTower : energyTowers){
+            currentTimeEnergy = System.nanoTime();
+            float deltaTimeEnergy = (currentTimeEnergy - lastUpdateTimeEnergy) / 1_000_000_000.0f;  // Convert to seconds
+            energyTower.harvestEnergy(deltaTimeEnergy);
+            energyTower.draw(g);
+        }
+        lastUpdateTimeEnergy = currentTimeEnergy;
+
+        if (projectiles != null) {
+            updateProjectiles(g);
+        }
+    }
+
+    /*
+    Description: preloads all background images to reduce cpu usage
+    Pre-Condition: run by GameScreen constructor
+    Post-Condition: based on the integers on map grid, sets background to specified images
+    */
+    public void preloadBackground(){
+        backGroundImages = new Image[size][size];
+        for(int y = 0; y < size; y++){
+            for(int x = 0; x < size; x++){
+                if(map[y][x] == 0){
+                    backGroundImages[y][x] = img.getSubimage(19*64, 6*64, 64, 64);
+                }else if(map[y][x] == 1){
+                    backGroundImages[y][x] = img.getSubimage(21*64, 6*64, 64, 64);
+                }else if(map[y][x] == 9){
+                    backGroundImages[y][x] = img.getSubimage(22*64, 4*64, 64, 64);
+                }
+            }
+        }
+    }
+
+    /*
+    Description: creates new enemies
+    Pre-Condition: run every time a new instance of gameThread is created, requires a double for spawn interval
+    Post-Condition: adds an enemy to a the ArrayList enemies to keep track of their actions
+    */
+    public void makeEnemies(double spawnInterval){
+        long currentSpawnTime = System.nanoTime();
+        if (currentSpawnTime - lastSpawnTime >= spawnInterval) {
+            if(enemyCounter < amountOfEnemies){
+                enemies.add(new Enemy(0, 64, img.getSubimage(18 * 64, 11 * 64, 64, 64)));
+                lastSpawnTime = currentSpawnTime;
+                enemyCounter++;
+            }
+        }
+        if(enemyCounter == (amountOfEnemies)){
+            allEnemiesMade = true;
+        }
+    }
+
+    /*
+    Description: updates enemy positions and states
+    Pre-Condition: called once per frame while gameThread is active
+    Post-Condition: updates enemy position, removes enemy from ArrayList enemies if needed, then checks if wave completed
+    */
+    private void updateEnemies() {
+        // Use an iterator to safely remove enemies
+        Iterator<Enemy> iterator = enemies.iterator();
+        while (iterator.hasNext()) {
+            Enemy enemy = iterator.next();
+            if(enemy.isEnemyDead()){
+                iterator.remove();
+                money++;
+                System.out.println("Enemy killed");
+            }else if (enemy.update()) {
+                userLoseHP();
+                iterator.remove();
+                System.out.println("Enemy reached the end");
+            }
+            MenuScreen.displayMoney();
+            checkWaveComplete();
+        }
+    }
+
+    /*
+    Description: damages the frontmost enemy if a word was typed correctly
+    Pre-Condition: requires int damage, only called once a word has been typed correctly
+    Post-Condition: removes first iteration of enemy in ArrayList enemies
+    */
+    public void damageFirstEnemy(int damage) {
+        if (!enemies.isEmpty()) {
+            Enemy firstEnemy = enemies.get(0);
+            if (firstEnemy.takeDamage(damage)) {
+                enemies.remove(firstEnemy); // Remove if health is 0
+                money += 5;
+                System.out.println("Enemy with text!");
                 checkWaveComplete();
             }
         }
-    
-        public void damageFirstEnemy(int damage) {
-            if (!enemies.isEmpty()) {
-                Enemy firstEnemy = enemies.get(0);
-                if (firstEnemy.takeDamage(damage)) {
-                    enemies.remove(firstEnemy); // Remove if health is 0
-                    money += 5;
-                    System.out.println("Enemy with text!");
-                    checkWaveComplete();
-                }
-            }
-        }
-    
-        private void updateProjectiles(Graphics g){
-            Iterator<Projectile> projectileIterator = projectiles.iterator();
-            while (projectileIterator.hasNext()) {
-                Projectile projectile = projectileIterator.next();
-                projectile.update();
-                if (projectile.isOutOfBounds() || projectile.hasHitEnemy(enemies)) {
-                    projectileIterator.remove();
-                } else {
-                    projectile.draw(g);
-                }
-            }
-        }
-    
-        public static void checkWaveComplete(){
-            if(enemies.isEmpty() && allEnemiesMade){
-                if(wave == 20){
-                    Object[] options = {"Yes", "No"};
-                    int gameContinue = JOptionPane.showOptionDialog(null, "You win! Would you like to play infinite mode?", "You Win",JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,null,options, options[0]);
-                    
-                    if(gameContinue == 0){
-                        wave++;
-                    }else if(gameContinue == 1) {
-                        JOptionPane.showMessageDialog(null, "Thank you for playing WORDS TD :)", "WORDS TD", JOptionPane.INFORMATION_MESSAGE);
-                        System.exit(0);
-                    }
-                }else{
-                    wave++;
-                }
-                MenuScreen.displayWave();
-                enemies.clear();
-                MenuScreen.flipPlayOn();
-                MenuScreen.resetPlayButton();
-                enemyCounter = 0;
-                allEnemiesMade = false;
-            }
-        }
+    }
 
+    /*
+    Description: updates the projectiles motion
+    Pre-Condition: requires Graphics g, called every time paintComponent is run
+    Post-Condition: changes each projectile's position on the game, also checks if out of bounds or hit an enemy
+    */
+    private void updateProjectiles(Graphics g){
+        Iterator<Projectile> projectileIterator = projectiles.iterator();
+        while (projectileIterator.hasNext()) {
+            Projectile projectile = projectileIterator.next();
+            projectile.update();
+            if (projectile.isOutOfBounds() || projectile.hasHitEnemy(enemies)) {
+                projectileIterator.remove();
+            } else {
+                projectile.draw(g);
+            }
+        }
+    }
+
+    /*
+    Description: checks if the wave has been complete
+    Pre-Condition: called every time an enemy is killed and if all the enemies that wave were created
+    Post-Condition: checks the win condition and increases the wave by 1, also resets variables
+    */
+    public static void checkWaveComplete(){
+        if(enemies.isEmpty() && allEnemiesMade){
+            if(wave == 20){
+                Object[] options = {"Yes", "No"};
+                int gameContinue = JOptionPane.showOptionDialog(null, "You win! Would you like to play infinite mode?", "You Win",JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,null,options, options[0]);
+                
+                if(gameContinue == 0){
+                    wave++;
+                }else if(gameContinue == 1) {
+                    JOptionPane.showMessageDialog(null, "Thank you for playing WORDS TD :)", "WORDS TD", JOptionPane.INFORMATION_MESSAGE);
+                    System.exit(0);
+                }
+            }else{
+                wave++;
+            }
+            MenuScreen.displayWave();
+            enemies.clear();
+            MenuScreen.flipPlayOn();
+            MenuScreen.resetPlayButton();
+            enemyCounter = 0;
+            allEnemiesMade = false;
+        }
+    }
+
+    /*
+    Description: subtract health from the user
+    Pre-Condition: called only if the enemy completes the entire track
+    Post-Condition: subtracts 1 health from user and checks lose condition
+    */
     public void userLoseHP(){
         userHP--;
         MenuScreen.displayHealth();
@@ -394,9 +451,25 @@ public class GameScreen extends JPanel{
         }
     }
 
+    /*
+    Description: gets the user's health
+    Pre-Condition: called when the user loses health
+    Post-Condition: returns userHP to MenuScreen to display health
+    */
     public static int getUserHP(){ return userHP; }
+
+    /*
+    Description: gets the current wave
+    Pre-Condition: called only if checkWaveComplete returns true
+    Post-Condition: returns wave to MenuScreen to display wave
+    */
     public static int getWave(){ return wave; }
 
+    /*
+    Description: shows the tower menu if tower is clicked
+    Pre-Condition: called only if mouse is clicked onto a tower: requires int x, int y, and Tower tower (selected tower)
+    Post-Condition: shows a JPopupMenu menu originating at the selected tower's center
+    */
     private void showTowerMenu(int x, int y, Tower tower) {
         JPopupMenu menu = new JPopupMenu();
 
@@ -409,9 +482,14 @@ public class GameScreen extends JPanel{
         menu.add(upgradeOption);
         menu.add(sellOption);
 
-        menu.show(this, x + 32, y + 32); // Adjusted to display below the tower
+        menu.show(this, x + 32, y + 32);
     }
 
+    /*
+    Description: shows the upgrade options for tower
+    Pre-Condition: called only if JMenuItem upgradeOption is selected: requires int x, int y, Tower tower
+    Post-Condition: shows new JPopupMenu with upgrade options
+    */
     private void showUpgradeMenu(int x, int y, Tower tower){
         JPopupMenu upgradeMenu = new JPopupMenu();
 
@@ -427,6 +505,11 @@ public class GameScreen extends JPanel{
         upgradeMenu.show(this, x + 64, y + 32);
     }
 
+    /*
+    Description: sells the selected tower
+    Pre-Condition: called only if sellOption is selected: requires int x, int y, Tower tower
+    Post-Condition: sets the towers location in the map grid to 0 (nothing placed there) and changes prices to be cheaper
+    */
     public void sellTower(int x, int y, Tower tower){
         map[y/64][x/64] = 0;
         towers.remove(tower);
@@ -436,6 +519,11 @@ public class GameScreen extends JPanel{
         MenuScreen.displayTowerCost();
     }
 
+    /*
+    Description: shows the energy tower menu if clicked
+    Pre-Condition: called only if mouse is clicked onto an existing energy tower: requires int x, int y, EnergyTower energyTower
+    Post-Condition: creates a JPopupMenu menu originating at the center of the energy tower with the option to sell
+    */
     private void showEnergyTowerMenu(int x, int y, EnergyTower energyTower) {
         JPopupMenu menu = new JPopupMenu();
 
@@ -444,9 +532,14 @@ public class GameScreen extends JPanel{
 
         menu.add(sellOption);
 
-        menu.show(this, x + 32, y + 32); // Adjusted to display below the tower
+        menu.show(this, x + 32, y + 32);
     }
 
+    /*
+    Description: sells the selected energy tower
+    Pre-Condition: called only if JMenuOption sellOption is selected: requires int x, int y, EnergyTower energyTower
+    Post-Condition: sets the energy tower's location on the map grid to 0 and changes prices to be cheaper
+    */
     public void sellEnergyTower(int x, int y, EnergyTower energyTower){
         map[y/64][x/64] = 0;
         energyTowers.remove(energyTower);
@@ -456,6 +549,11 @@ public class GameScreen extends JPanel{
         MenuScreen.displayEnergyTowerCost();
     }
 
+    /*
+    Description: lowers the "reload" time for attack towers
+    Pre-Condition: called only if JMenuItem fireRateOption is selected: requires Tower tower
+    Post-Condition: lowers the selected tower's fireRate by 0.1, uses money and displays new money amount
+    */
     public void lowerFireRate(Tower tower) {
         if(tower.getFireRate() <= 0.31){
             JOptionPane.showOptionDialog(null, "You have maxed out this upgrade","Maxed Out Upgrade", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, new Object[]{"OK"}, "OK");
@@ -471,6 +569,11 @@ public class GameScreen extends JPanel{
         }
     }
 
+    /*
+    Description: increases the range of the attack towers
+    Pre-Condition: called only if JMenuItem rangeOption is selected: requires Tower tower
+    Post-Condition: increases the selected tower's range by 40, uses money and displays new money amount
+    */
     public void increaseRange(Tower tower) {
         if (money >= rangeCost) {
             money -= rangeCost;
@@ -481,15 +584,44 @@ public class GameScreen extends JPanel{
         }
     }
 
+    /*
+    Description: gets the money amount
+    Pre-Condition: called every time a transaction is performed in game
+    Post-Condition: returns the int money to display in MenuScreen
+    */
     public static int getMoney(){ return money; }
+
+    /*
+    Description: gets the cost of the attack tower
+    Pre-Condition: called every time a new tower is placed
+    Post-Condition: returns the int towerCost to display in MenuScreen
+    */
     public static int getTowerCost(){ return towerCost; }
+
+    /*
+    Description: gets the cost of the energy tower
+    Pre-Condition: called every time a new energy tower is placed
+    Post-Condition: returns the int energyTowerCost to display in MenuScreen
+    */
     public static int getEnergyTowerCost(){ return energyTowerCost; }
+
+    /*
+    Description: uses user's money to buy attack tower
+    Pre-Condition: called only if attack tower is placed onto the map: requires int cost
+    Post-Condition: subtracts the user's money by the cost of the attack tower, displays new money and towerCost values in MenuScreen
+    */
     public void useMoneyForAttackTower(int cost){ 
         money -= cost; 
         towerCost += 5;
         MenuScreen.displayMoney();
         MenuScreen.displayTowerCost();
     }
+
+    /*
+    Description: uses user's money to buy energy tower
+    Pre-Condition: called only if energy tower is placed onto the map: requires int cost
+    Post-Condition: subtracts the user's money by the cost of the energy tower, displays new money and towerCost values in MenuScreen
+    */
     public void useMoneyForEnergyTower(int cost){ 
         money -= cost; 
         energyTowerCost += 10;
@@ -499,10 +631,8 @@ public class GameScreen extends JPanel{
 }
 
 /*
- * add a boss every 10 waves
- * check if upgrade was clicked
- * determine if money is more than towerCost
- * place tower and take away cost from money
- * if money is lower than towerCost, display to the user that they do not have enough money
+ * If I had extra time I would:
+ * organize code (move all jumbled code in GameScreen to their respective classes)
+ * add boss every 10 waves
  * add different types of towers
  */
