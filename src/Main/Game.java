@@ -117,7 +117,7 @@ public class Game extends JFrame{
 
     /*
     Description: plays audio based on the wav. file provided
-    Pre-Condition: Game class needs to be run
+    Pre-Condition: Game class needs to be run: requires 1 String
     Post-Condition: plays audioFile and loops while playing
      */
     private void playMusic(String filePath){
@@ -142,3 +142,4 @@ public class Game extends JFrame{
         new Game();
     }
 }
+//1625 lines!!!

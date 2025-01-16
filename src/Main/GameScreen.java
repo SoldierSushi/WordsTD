@@ -628,7 +628,6 @@ public class GameScreen extends JPanel{
         MenuScreen.displayEnergyTowerCost();
     }
 }
-
 /*
  * If I had extra time I would:
  * organize code (move all jumbled code in GameScreen to their respective classes)

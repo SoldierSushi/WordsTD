@@ -18,6 +18,11 @@ public class EnergyTower {
         this.timeSinceLastEnergy = 0;
     }
 
+    /*
+    Description: creates energy
+    Pre-Condition: called every time an energy tower generates energy: requires 1 float
+    Post-Condition: adds energy and displays it to the user
+    */
     public void harvestEnergy(float deltaTimeEnergy){
         timeSinceLastEnergy += deltaTimeEnergy;
         if(MenuScreen.isGameTrue()){
@@ -29,9 +34,25 @@ public class EnergyTower {
         }
     }
 
+    /*
+    Description: gets the energy tower's x coordinate
+    Pre-Condition: called when the energy tower is placed or when it is clicked
+    Post-Condition: returns towerX * 64 because each displayed tile is 64 pixels 
+    */
     public int getX() { return towerX*64; }
+
+    /*
+    Description: gets the energy tower's y coordinate
+    Pre-Condition: called when the energy tower is placed or when it is clicked
+    Post-Condition: returns towerY * 64 because each displayed tile is 64 pixels 
+    */
     public int getY() { return towerY*64; }
 
+    /*
+    Description: draws the energy tower
+    Pre-Condition: called every time paintComponent() runs
+    Post-Condition: draws the energy tower using the towerX and towerY coordinates
+    */
     public void draw(Graphics g) {
         int towerScreenX = towerX * 64;
         int towerScreenY = towerY * 64;

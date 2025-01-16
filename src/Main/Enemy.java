@@ -65,6 +65,11 @@ public class Enemy {
         return false;
     }
 
+    /*
+    Description: checks if the enemy is killed
+    Pre-Condition: called every time an enemy is dealt damage
+    Post-Condition: returns a boolean true or false, true for dead and false for alive
+    */
     public boolean isEnemyDead(){
         if(health == 0){
             return true;
@@ -72,6 +77,11 @@ public class Enemy {
         return false;
     }
 
+    /*
+    Description: finds the next space for the enemy to travel towards
+    Pre-Condition: called every time the enemy reaches its target tile
+    Post-Condition: changes the tile the enemy is moving towards and adusts its rotation
+    */
     private void findNextCell() {
         // Check adjacent cells in a fixed order: right, down, left, up
         if (enemyPathMap[mapY][mapX + 1] > enemyPathMap[mapY][mapX]) {
@@ -89,24 +99,49 @@ public class Enemy {
         }
     }
 
+    /*
+    Description: gets the enemies x coordinate
+    Pre-Condition: called in GameScreen for enemy interactions
+    Post-Condition: returns the value of enemyX
+    */
     public int getX() {
-        return enemyX; // Replace with the actual x-coordinate field
+        return enemyX;
     }
     
+    /*
+    Description: gets the enemies y coordinate
+    Pre-Condition: called in GameScreen for enemy interactions
+    Post-Condition: returns the value of enemyY
+    */
     public int getY() {
-        return enemyY; // Replace with the actual y-coordinate field
+        return enemyY;
     }
 
+    /*
+    Description: gets the boundaries of the enemy
+    Pre-Condition: called Projectile class to check for enemy and projectile interaction
+    Post-Condition: returns a Rectangle the same size and location as the enemy
+    */
     public Rectangle getBounds() {
         return new Rectangle(enemyX, enemyY, 64, 64);
     }
 
+    /*
+    Description: causes the enemy to take damage
+    Pre-Condition: called every time a word is typed correctly or projectile hits enemy: requires 1 int
+    Post-Condition: deals damage to enemy, returns true or false based on if the health value is above 0
+    */
     public boolean takeDamage(int damage) {
         health -= damage;
         if (health < 0) health = 0;
         return health == 0;
     }
 
+    /*
+    Description: draws the enemy
+    Pre-Condition: called every time paintComponent() runs
+    Post-Condition: draws the enemy using its x, y and rotational values
+    */
     public void draw(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         var originalTransform = g2d.getTransform();
