@@ -34,6 +34,7 @@ public class MenuScreen extends JPanel implements KeyListener{
     private Runnable wordCompletedCallback;
     private Runnable startGameCallback;
     private static boolean play = false;
+    private static TowerType selectedTowerType = null;
 
     public MenuScreen(){
         setLayout(null);
@@ -104,6 +105,7 @@ public class MenuScreen extends JPanel implements KeyListener{
         towerAttackButton.addActionListener(e -> {
             if(GameScreen.getMoney() >= GameScreen.getTowerCost() || isTowerAttackOn()){
                 flipTowerAttackValue();
+                selectedTowerType = TowerType.ATTACK;
             }
         });
 
@@ -116,6 +118,7 @@ public class MenuScreen extends JPanel implements KeyListener{
         EnergyTowerButton.addActionListener(e -> {
             if(GameScreen.getMoney() >= GameScreen.getEnergyTowerCost() || isEnergyTowerOn()){
                 flipEnergyTowerValue();
+                selectedTowerType = TowerType.ENERGY;
             }
         });
 
@@ -145,6 +148,10 @@ public class MenuScreen extends JPanel implements KeyListener{
         add(userHPLabel);
         add(waveLabel);
         add(moneyLabel);
+    }
+
+    public static TowerType getTowerType(){
+        return selectedTowerType;
     }
 
     /*

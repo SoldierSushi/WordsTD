@@ -60,7 +60,6 @@ public class GameScreen extends JPanel{
     private JMenuItem fireRateOption;
     private JMenuItem rangeOption;
     private boolean gameON = false;
-    private TowerType selectedTowerType = null;
     
     public GameScreen(BufferedImage img, MenuScreen menuScreen) {
         this.img = img;
@@ -134,19 +133,13 @@ public class GameScreen extends JPanel{
                 System.out.println("mouse clicked");
                 int x = e.getX() / 64;
                 int y = e.getY() / 64;
+                System.out.println("selected tower: " + MenuScreen.getTowerType());
                 
-                if(MenuScreen.isTowerAttackOn()){
-                    if (x >= 0 && x < size && y >= 0 && y < size) {
-                        if (map[y][x] == 0) {
-                            map[y][x] = 2;
-                            towers.add(new Tower(x, y, img.getSubimage(20 * 64, 8 * 64, 64, 64), fireRate, range));
-                        }
-                    }
-                    MenuScreen.flipTowerAttackValue();
-                    useMoneyForAttackTower(getTowerCost());
-                    MenuScreen.displayMoney();
+                if (!isValidTile(x, y) || MenuScreen.getTowerType() == null || !MenuScreen.isTowerAttackOn() || !MenuScreen.isEnergyTowerOn()) {
+                    return;
+                }
 
-                }else if(map[y][x] == 2){
+                if(map[y][x] == 2){
                     for (Tower tower : towers) {
                         if (tower.getX() / 64 == x && tower.getY() / 64 == y) {
                             showTowerMenu(x * 64, y * 64, tower);
@@ -160,20 +153,36 @@ public class GameScreen extends JPanel{
                             return;
                         }
                     }
-
-                }else if(MenuScreen.isEnergyTowerOn()){
-                    if (x >= 0 && x < size && y >= 0 && y < size) {
-                        if (map[y][x] == 0) {
-                            map[y][x] = 3;
-                            energyTowers.add(new EnergyTower(x, y, img.getSubimage(21 * 64, 8 * 64, 64, 64), 3));
-                        }
-                    }
-                    MenuScreen.flipEnergyTowerValue();
-                    useMoneyForEnergyTower(getEnergyTowerCost());
-                    MenuScreen.displayMoney();
+                }else{
+                    placeTower(x, y, MenuScreen.getTowerType());
                 }
             }
         });
+    }
+
+    private boolean isValidTile(int x, int y){
+        return x >= 0 && x < size && y >= 0 && y < size;
+    }
+
+    private void placeTower(int x, int y, TowerType towerType){
+        switch (towerType){
+            case ATTACK:
+                map[y][x] = 2;
+                towers.add(new Tower(x, y, img.getSubimage(20 * 64, 8 * 64, 64, 64), fireRate, range));
+                MenuScreen.flipTowerAttackValue();
+                useMoneyForAttackTower(getTowerCost());
+                MenuScreen.displayMoney();
+                break;
+            case ENERGY:
+                map[y][x] = 3;
+                energyTowers.add(new EnergyTower(x, y, img.getSubimage(21 * 64, 8 * 64, 64, 64), 3));
+                MenuScreen.flipEnergyTowerValue();
+                useMoneyForEnergyTower(getEnergyTowerCost());
+                MenuScreen.displayMoney();
+                break;
+            default:
+                return;
+        }
     }
 
     /*
