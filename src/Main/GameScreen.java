@@ -59,12 +59,13 @@ public class GameScreen extends JPanel{
     private Tower hoveredTower = null;
     private JMenuItem fireRateOption;
     private JMenuItem rangeOption;
+    private boolean gameON = false;
+    private TowerType selectedTowerType = null;
     
     public GameScreen(BufferedImage img, MenuScreen menuScreen) {
         this.img = img;
 
         preloadBackground();
-        startTowerPlacingThread();
         startGameThread();
         setupMouseListener();
         setupMouseMotionListener();
@@ -74,6 +75,7 @@ public class GameScreen extends JPanel{
         
         menuScreen.setWordCompletedCallback(() -> damageFirstEnemy(menuScreen.getWordTyped().length()));
         menuScreen.startGameCallback(this::startGameThread);
+        gameON = true;
     }
 
     /*
@@ -92,9 +94,7 @@ public class GameScreen extends JPanel{
                 System.out.println("Enemies to spawn: " + amountOfEnemies);
                 float spawnInterval = 1000000000 * (float) spawnSpeed ; // 1 second in nanoseconds
                 lastSpawnTime = System.nanoTime();
-                while(MenuScreen.isGameTrue()){
-                    makeEnemies(spawnInterval);
-    
+                while(gameON){
                     if (fps == 30) {
                         System.out.println("FPS: " + fps);
                         fps = 0;
@@ -102,9 +102,13 @@ public class GameScreen extends JPanel{
                         fps++;
                     }
 
-                    updateEnemies();
+                    if(MenuScreen.isGameTrue()){
+                        makeEnemies(spawnInterval);
+                        updateEnemies();
+                    }
 
-                    //saves cpu usage, sets frame rate to 30
+                    repaint();
+
                     long frameTime = System.nanoTime();
                     try {
                         long sleepTime = Math.max(0, 33 - (System.nanoTime() - frameTime) / 1_000_000);
@@ -116,40 +120,6 @@ public class GameScreen extends JPanel{
             }
         }, "gameThread");
         gameThread.start();
-    }
-
-    /*
-    Description: contantly running thread to check for tower placements and other functions that work outside the main game
-    Pre-Condition: called by GameScreen constructor
-    Post-Condition: creates a new Thread towerPlacingThread that runs for the entire duration of the game
-    */
-    public void startTowerPlacingThread(){
-        Thread towerPlacingThread = new Thread(new Runnable() {
-            @Override
-            public void run() { 
-                while(true){
-                    if (fps == 30) {
-                        System.out.println("FPS: " + fps);
-                        fps = 0;
-                    } else {
-                        fps++;
-                    }
-
-                    //real stuff
-                    repaint();
-
-                    //saves cpu usage
-                    long frameTime = System.nanoTime();
-                    try {
-                        long sleepTime = Math.max(0, 33 - (System.nanoTime() - frameTime) / 1_000_000);
-                        Thread.sleep(sleepTime);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }, "towerPlacingThread");
-        towerPlacingThread.start();
     }
 
     /*

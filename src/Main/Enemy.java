@@ -48,10 +48,10 @@ public class Enemy {
         int targetY = mapY * 64;
     
         // Move toward the target pixel position
-        if (enemyX < targetX) enemyX += 8;
-        if (enemyX > targetX) enemyX -= 8;
-        if (enemyY < targetY) enemyY += 8;
-        if (enemyY > targetY) enemyY -= 8;
+        if (enemyX < targetX) enemyX += 4;
+        if (enemyX > targetX) enemyX -= 4;
+        if (enemyY < targetY) enemyY += 4;
+        if (enemyY > targetY) enemyY -= 4;
 
         // If reached target cell, find the next cell
         if(enemyPathMap[mapY][mapX] != 62){
