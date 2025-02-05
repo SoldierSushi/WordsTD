@@ -28,8 +28,6 @@ public class MenuScreen extends JPanel implements KeyListener{
     private static JButton towerAttackButton;
     private static JButton EnergyTowerButton;
     private static JButton PlayButton;
-    private static boolean towerAttackOn = false;
-    private static boolean EnergyTowerOn = false;
     private static int energy = 10;
     private Runnable wordCompletedCallback;
     private Runnable startGameCallback;
@@ -103,8 +101,7 @@ public class MenuScreen extends JPanel implements KeyListener{
         towerAttackButton.setFocusable(false);
         displayTowerCost();
         towerAttackButton.addActionListener(e -> {
-            if(GameScreen.getMoney() >= GameScreen.getTowerCost() || isTowerAttackOn()){
-                flipTowerAttackValue();
+            if(GameScreen.getMoney() >= GameScreen.getTowerCost()){
                 selectedTowerType = TowerType.ATTACK;
             }
         });
@@ -116,8 +113,7 @@ public class MenuScreen extends JPanel implements KeyListener{
         EnergyTowerButton.setFocusable(false);
         displayEnergyTowerCost();
         EnergyTowerButton.addActionListener(e -> {
-            if(GameScreen.getMoney() >= GameScreen.getEnergyTowerCost() || isEnergyTowerOn()){
-                flipEnergyTowerValue();
+            if(GameScreen.getMoney() >= GameScreen.getEnergyTowerCost()){
                 selectedTowerType = TowerType.ENERGY;
             }
         });
@@ -154,6 +150,10 @@ public class MenuScreen extends JPanel implements KeyListener{
         return selectedTowerType;
     }
 
+    public static void setTowerType(TowerType towerType){
+        selectedTowerType = towerType;
+    }
+
     /*
     Description: sets the focus to be on the current window, this allows for typing checks without using a textField
     Pre-Condition: called only when a new instance of Game constructor is made: requires 1 boolean
@@ -165,44 +165,6 @@ public class MenuScreen extends JPanel implements KeyListener{
         if (visible) {
             requestFocusInWindow(); // Re-request focus when visible
         }
-    }
-
-    /*
-    Description: checks if a new attack tower is in the process of being placed
-    Pre-Condition: called when towerAttackButton is clicked and whenever the mouse has been clicked
-    Post-Condition: returns the boolean towerAttackOn (true or false)
-    */
-    public static boolean isTowerAttackOn(){return towerAttackOn;}
-
-    /*
-    Description: flips towerAttackOn to the opposite state
-    Pre-Condition: called when towerAttackButton is clicked as well as after a tower has been placed
-    Post-Condition: flips the towerAttackOn value from true -> false and vice versa
-    */
-    public static void flipTowerAttackValue(){ 
-        if(EnergyTowerOn){
-            EnergyTowerOn = !EnergyTowerOn;
-        }
-        towerAttackOn = !towerAttackOn;
-    }
-
-    /*
-    Description: checks if a new energy tower is in the process of being placed
-    Pre-Condition: called when EnergyTowerButton is clicked and whenever the mouse has been clicked
-    Post-Condition: returns the boolean EnergyTowerOn (true or false)
-    */
-    public static boolean isEnergyTowerOn(){return EnergyTowerOn;}
-
-    /*
-    Description: flips EnergyTowerOn to the opposite state
-    Pre-Condition: called when EnergyTowerButton is clicked as well as after a tower has been placed
-    Post-Condition: flips the EnergyTowerOn value from true -> false and vice versa
-    */
-    public static void flipEnergyTowerValue(){ 
-        if(towerAttackOn){
-            towerAttackOn = !towerAttackOn;
-        }
-        EnergyTowerOn = !EnergyTowerOn; 
     }
 
     /*

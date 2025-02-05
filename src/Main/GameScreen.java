@@ -10,7 +10,9 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 public class GameScreen extends JPanel{ 
     private BufferedImage img;
@@ -53,7 +55,7 @@ public class GameScreen extends JPanel{
     private int amountOfEnemies = 0;
     private int range = 160;
     private int rangeCost = 4;
-    private static int money = 20;
+    private static int money = 200;
     private static int towerCost = 20;
     private static int energyTowerCost = 100;
     private Tower hoveredTower = null;
@@ -130,30 +132,17 @@ public class GameScreen extends JPanel{
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                System.out.println("mouse clicked");
                 int x = e.getX() / 64;
                 int y = e.getY() / 64;
                 System.out.println("selected tower: " + MenuScreen.getTowerType());
-                
-                if (!isValidTile(x, y) || MenuScreen.getTowerType() == null || !MenuScreen.isTowerAttackOn() || !MenuScreen.isEnergyTowerOn()) {
+
+                if (!isValidTile(x, y)) {
                     return;
                 }
 
-                if(map[y][x] == 2){
-                    for (Tower tower : towers) {
-                        if (tower.getX() / 64 == x && tower.getY() / 64 == y) {
-                            showTowerMenu(x * 64, y * 64, tower);
-                            return;
-                        }
-                    }
-                }else if(map[y][x] == 3){
-                    for (EnergyTower energyTower : energyTowers) {
-                        if (energyTower.getX() / 64 == x && energyTower.getY() / 64 == y) {
-                            showEnergyTowerMenu(x * 64, y * 64, energyTower);
-                            return;
-                        }
-                    }
-                }else{
+                if (MenuScreen.getTowerType() == null) {
+                    handleTowerSelection(x, y);
+                } else {
                     placeTower(x, y, MenuScreen.getTowerType());
                 }
             }
@@ -169,20 +158,38 @@ public class GameScreen extends JPanel{
             case ATTACK:
                 map[y][x] = 2;
                 towers.add(new Tower(x, y, img.getSubimage(20 * 64, 8 * 64, 64, 64), fireRate, range));
-                MenuScreen.flipTowerAttackValue();
+                MenuScreen.setTowerType(null);
                 useMoneyForAttackTower(getTowerCost());
                 MenuScreen.displayMoney();
                 break;
             case ENERGY:
                 map[y][x] = 3;
                 energyTowers.add(new EnergyTower(x, y, img.getSubimage(21 * 64, 8 * 64, 64, 64), 3));
-                MenuScreen.flipEnergyTowerValue();
+                MenuScreen.setTowerType(null);
                 useMoneyForEnergyTower(getEnergyTowerCost());
                 MenuScreen.displayMoney();
                 break;
             default:
                 return;
         }
+    }
+
+    private void handleTowerSelection(int x, int y) {
+    Map<Integer, Runnable> selectionActions = new HashMap<>();
+    
+    selectionActions.put(2, () -> towers.stream()
+        .filter(tower -> tower.getX() / 64 == x && tower.getY() / 64 == y)
+        .findFirst()
+        .ifPresent(tower -> showTowerMenu(x * 64, y * 64, tower))
+    );
+
+    selectionActions.put(3, () -> energyTowers.stream()
+        .filter(energyTower -> energyTower.getX() / 64 == x && energyTower.getY() / 64 == y)
+        .findFirst()
+        .ifPresent(energyTower -> showEnergyTowerMenu(x * 64, y * 64, energyTower))
+    );
+
+    selectionActions.getOrDefault(map[y][x], () -> {}).run();
     }
 
     /*
@@ -230,7 +237,7 @@ public class GameScreen extends JPanel{
         float transparency = 0.5f;
         Graphics2D hover = (Graphics2D) g;
         
-        if(MenuScreen.isEnergyTowerOn() || MenuScreen.isTowerAttackOn()){
+        if(MenuScreen.getTowerType() != null){
             hover.setColor(Color.BLACK);
             hover.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, transparency));
             hover.fillRect(hoveredTileX * 64, hoveredTileY * 64, 64, 64);
