@@ -59,8 +59,6 @@ public class GameScreen extends JPanel{
     private static int towerCost = 20;
     private static int energyTowerCost = 100;
     private Tower hoveredTower = null;
-    private JMenuItem fireRateOption;
-    private JMenuItem rangeOption;
     private boolean gameON = false;
     
     public GameScreen(BufferedImage img, MenuScreen menuScreen) {
@@ -150,7 +148,7 @@ public class GameScreen extends JPanel{
     }
 
     private boolean isValidTile(int x, int y){
-        return x >= 0 && x < size && y >= 0 && y < size;
+        return x >= 0 && x < size && y >= 0 && y < size && map[y][x] == 0;
     }
 
     private void placeTower(int x, int y, TowerType towerType){
@@ -233,7 +231,6 @@ public class GameScreen extends JPanel{
     @Override
     public void paintComponent(Graphics g){
         super.paintComponent(g);
-        double angleToEnemy = 0;
         float transparency = 0.5f;
         Graphics2D hover = (Graphics2D) g;
         
@@ -243,15 +240,19 @@ public class GameScreen extends JPanel{
             hover.fillRect(hoveredTileX * 64, hoveredTileY * 64, 64, 64);
         }
 
-        for(int y = 0; y < size; y++){
-            for(int x = 0; x < size; x++){
-                g.drawImage(backGroundImages[y][x], x*64, y*64, null);
-            }
-        }
+        loadBackground(g);
+        drawHoverEffect(hover);
+        drawEnemies(g);
+        drawAttackTower(g);
+        drawEnergyTower(g);
 
-        for (Enemy enemy : new ArrayList<>(enemies)) {
-            enemy.draw(g);
+        if (projectiles != null) {
+            updateProjectiles(g);
         }
+    }
+
+    private void drawAttackTower(Graphics g){
+        double angleToEnemy = 0;
 
         for(Tower tower : towers){
             Enemy nearestEnemy = tower.nearestEnemy(enemies);
@@ -270,18 +271,10 @@ public class GameScreen extends JPanel{
             
             tower.draw(g, angleToEnemy);
         }
-
-        if (hoveredTower != null) {
-            int centerX = hoveredTower.getX() + 32;
-            int centerY = hoveredTower.getY() + 32;
-            int showrange = hoveredTower.getRange(); 
-            g.setColor(new Color(255, 0, 0, 64)); // Semi-transparent blue
-            g.fillOval(centerX - showrange, centerY - showrange, showrange * 2, showrange * 2);
-            g.drawOval(centerX - showrange, centerY - showrange, showrange * 2, showrange * 2);
-        }
-
         lastUpdateTime = currentTime;
+    }
 
+    private void drawEnergyTower(Graphics g){
         for(EnergyTower energyTower : energyTowers){
             currentTimeEnergy = System.nanoTime();
             float deltaTimeEnergy = (currentTimeEnergy - lastUpdateTimeEnergy) / 1_000_000_000.0f;
@@ -289,9 +282,16 @@ public class GameScreen extends JPanel{
             energyTower.draw(g);
         }
         lastUpdateTimeEnergy = currentTimeEnergy;
+    }
 
-        if (projectiles != null) {
-            updateProjectiles(g);
+    private void drawHoverEffect(Graphics2D g){
+        if (hoveredTower != null) {
+            int centerX = hoveredTower.getX() + 32;
+            int centerY = hoveredTower.getY() + 32;
+            int showrange = hoveredTower.getRange(); 
+            g.setColor(new Color(255, 0, 0, 64)); // Semi-transparent blue
+            g.fillOval(centerX - showrange, centerY - showrange, showrange * 2, showrange * 2);
+            g.drawOval(centerX - showrange, centerY - showrange, showrange * 2, showrange * 2);
         }
     }
 
@@ -311,6 +311,14 @@ public class GameScreen extends JPanel{
                 }else if(map[y][x] == 9){
                     backGroundImages[y][x] = img.getSubimage(22*64, 4*64, 64, 64);
                 }
+            }
+        }
+    }
+
+    private void loadBackground(Graphics g){
+        for(int y = 0; y < size; y++){
+            for(int x = 0; x < size; x++){
+                g.drawImage(backGroundImages[y][x], x*64, y*64, null);
             }
         }
     }
@@ -341,20 +349,28 @@ public class GameScreen extends JPanel{
     */
     private void updateEnemies() {
         // Use an iterator to safely remove enemies
-        Iterator<Enemy> iterator = enemies.iterator();
-        while (iterator.hasNext()) {
-            Enemy enemy = iterator.next();
-            if(enemy.isEnemyDead()){
-                iterator.remove();
-                money++;
-                System.out.println("Enemy killed");
-            }else if (enemy.update()) {
-                userLoseHP();
-                iterator.remove();
-                System.out.println("Enemy reached the end");
+        enemies.removeIf(enemy -> {
+            boolean remove = enemy.isEnemyDead() || enemy.update();
+            
+            if (remove) {
+                if (enemy.isEnemyDead()) {
+                    money += 5;
+                    System.out.println("Enemy killed");
+                } else {
+                    userLoseHP();
+                    System.out.println("Enemy reached the end");
+                }
+                
+                MenuScreen.displayMoney();
+                checkWaveComplete();
             }
-            MenuScreen.displayMoney();
-            checkWaveComplete();
+            return remove;
+        });
+    }
+
+    private void drawEnemies(Graphics g){
+        for (Enemy enemy : new ArrayList<>(enemies)) {
+            enemy.draw(g);
         }
     }
 
@@ -381,16 +397,15 @@ public class GameScreen extends JPanel{
     Post-Condition: changes each projectile's position on the game, also checks if out of bounds or hit an enemy
     */
     private void updateProjectiles(Graphics g){
-        Iterator<Projectile> projectileIterator = projectiles.iterator();
-        while (projectileIterator.hasNext()) {
-            Projectile projectile = projectileIterator.next();
+        projectiles.removeIf(projectile -> {
             projectile.update();
-            if (projectile.isOutOfBounds() || projectile.hasHitEnemy(enemies)) {
-                projectileIterator.remove();
-            } else {
+            
+            boolean remove = projectile.isOutOfBounds() || projectile.hasHitEnemy(enemies);
+            if(!remove){
                 projectile.draw(g);
             }
-        }
+            return remove;
+        });
     }
 
     /*
@@ -476,6 +491,8 @@ public class GameScreen extends JPanel{
     Post-Condition: shows new JPopupMenu with upgrade options
     */
     private void showUpgradeMenu(int x, int y, Tower tower){
+        JMenuItem fireRateOption;
+        JMenuItem rangeOption;
         JPopupMenu upgradeMenu = new JPopupMenu();
 
         fireRateOption =  new JMenuItem("Upgrade atk speed: $15");
@@ -544,10 +561,10 @@ public class GameScreen extends JPanel{
             JOptionPane.showOptionDialog(null, "You have maxed out this upgrade","Maxed Out Upgrade", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, new Object[]{"OK"}, "OK");
         }else{
             if(money >= fireRateCost){
-                    money -= fireRateCost;
-                    tower.setFireRate(0.1);
-                    System.out.println("tower fire rate: " + tower.getFireRate());
-                    MenuScreen.displayMoney();
+                money -= fireRateCost;
+                tower.setFireRate(0.1);
+                System.out.println("tower fire rate: " + tower.getFireRate());
+                MenuScreen.displayMoney();
             }else{
                 JOptionPane.showOptionDialog(null, "You do not have enough money to buy this upgrade","Insufficient Funds", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, new Object[]{"OK"}, "OK");
             }
