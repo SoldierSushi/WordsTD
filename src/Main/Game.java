@@ -58,7 +58,7 @@ public class Game extends JFrame{
     Post-Condition: sets BufferedImage img to the png
      */
     private void importImg(){
-        InputStream is = getClass().getResourceAsStream("/Main/towerDefense_tilesheet.png");
+        InputStream is = getClass().getResourceAsStream("src/Main/towerDefense_tilesheet.png");
         try {
             img = ImageIO.read(is);
         } catch (IOException e) {
