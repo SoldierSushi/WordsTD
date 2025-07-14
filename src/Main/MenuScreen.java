@@ -333,13 +333,13 @@ public class MenuScreen extends JPanel implements KeyListener{
     */
     public void getWord(){
         try {
-            Scanner input = new Scanner(new File("src/Main/words.txt"));
+            Scanner input = new Scanner(new File("src//words.txt"));
             while (input.hasNextLine()) {
                 words.add(input.nextLine().trim());
             }
             input.close();
         } catch (Exception e) {
-            System.out.println("src/Main/words.txt");
+            System.out.println("src//words.txt");
         }
         
         randomWord = randomWord();
