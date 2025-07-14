@@ -65,7 +65,6 @@ public class GameScreen extends JPanel{
         this.img = img;
 
         preloadBackground();
-        startGameThread();
         setupMouseListener();
         setupMouseMotionListener();
 
@@ -337,7 +336,7 @@ public class GameScreen extends JPanel{
                 enemyCounter++;
             }
         }
-        if(enemyCounter == (amountOfEnemies)){
+        if (enemyCounter >= amountOfEnemies) {
             allEnemiesMade = true;
         }
     }
@@ -348,10 +347,12 @@ public class GameScreen extends JPanel{
     Post-Condition: updates enemy position, removes enemy from ArrayList enemies if needed, then checks if wave completed
     */
     private void updateEnemies() {
-        // Use an iterator to safely remove enemies
-        enemies.removeIf(enemy -> {
+        Iterator<Enemy> iterator = enemies.iterator();
+
+        while (iterator.hasNext()) {
+            Enemy enemy = iterator.next();
             boolean remove = enemy.isEnemyDead() || enemy.update();
-            
+
             if (remove) {
                 if (enemy.isEnemyDead()) {
                     money += 5;
@@ -360,12 +361,12 @@ public class GameScreen extends JPanel{
                     userLoseHP();
                     System.out.println("Enemy reached the end");
                 }
-                
+
                 MenuScreen.displayMoney();
                 checkWaveComplete();
+                iterator.remove(); // safely remove during iteration
             }
-            return remove;
-        });
+        }
     }
 
     private void drawEnemies(Graphics g){
@@ -380,13 +381,15 @@ public class GameScreen extends JPanel{
     Post-Condition: removes first iteration of enemy in ArrayList enemies
     */
     public void damageFirstEnemy(int damage) {
-        if (!enemies.isEmpty()) {
-            Enemy firstEnemy = enemies.get(0);
-            if (firstEnemy.takeDamage(damage)) {
-                enemies.remove(firstEnemy);
-                money += 5;
-                System.out.println("Enemy with text!");
-                checkWaveComplete();
+        synchronized (enemies) {
+            if (enemies.size() != 1) {
+                Enemy firstEnemy = enemies.get(0);
+                if (firstEnemy.takeDamage(damage)) {
+                    enemies.remove(firstEnemy);
+                    money += 5;
+                    System.out.println("Enemy with text!");
+                    checkWaveComplete();
+                }
             }
         }
     }
@@ -414,26 +417,29 @@ public class GameScreen extends JPanel{
     Post-Condition: checks the win condition and increases the wave by 1, also resets variables
     */
     public static void checkWaveComplete(){
-        if(enemies.isEmpty() && allEnemiesMade){
-            if(wave == 20){
-                Object[] options = {"Yes", "No"};
-                int gameContinue = JOptionPane.showOptionDialog(null, "You win! Would you like to play infinite mode?", "You Win",JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,null,options, options[0]);
-                
-                if(gameContinue == 0){
+        synchronized (enemies) {
+            if(enemies.size() == 1 && allEnemiesMade){
+                System.out.println("Level complete");
+                if(wave == 2){
+                    Object[] options = {"Yes", "No"};
+                    int gameContinue = JOptionPane.showOptionDialog(null, "You win! Would you like to play infinite mode?", "You Win",JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,null,options, options[0]);
+                    
+                    if(gameContinue == 0){
+                        wave++;
+                    }else if(gameContinue == 1) {
+                        JOptionPane.showMessageDialog(null, "Thank you for playing WORDS TD :)", "WORDS TD", JOptionPane.INFORMATION_MESSAGE);
+                        System.exit(0);
+                    }
+                }else{
                     wave++;
-                }else if(gameContinue == 1) {
-                    JOptionPane.showMessageDialog(null, "Thank you for playing WORDS TD :)", "WORDS TD", JOptionPane.INFORMATION_MESSAGE);
-                    System.exit(0);
                 }
-            }else{
-                wave++;
+                MenuScreen.displayWave();
+                enemies.clear();
+                MenuScreen.flipPlayOn();
+                MenuScreen.resetPlayButton();
+                enemyCounter = 0;
+                allEnemiesMade = false;
             }
-            MenuScreen.displayWave();
-            enemies.clear();
-            MenuScreen.flipPlayOn();
-            MenuScreen.resetPlayButton();
-            enemyCounter = 0;
-            allEnemiesMade = false;
         }
     }
 

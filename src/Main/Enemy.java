@@ -73,8 +73,9 @@ public class Enemy {
     public boolean isEnemyDead(){
         if(health == 0){
             return true;
+        }else{
+            return false;
         }
-        return false;
     }
 
     /*
